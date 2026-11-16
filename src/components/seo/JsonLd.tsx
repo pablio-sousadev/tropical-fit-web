@@ -35,6 +35,7 @@ export function JsonLd() {
         }
       : {}),
     hasMap: mapsUrl,
+    telephone: '+55-61-8524-3521',
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',

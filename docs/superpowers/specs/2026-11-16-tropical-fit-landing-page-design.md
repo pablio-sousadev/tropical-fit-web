@@ -2,7 +2,7 @@
 
 **Data:** 2026-11-16  
 **Status:** Rascunho para aprovação (pré-orquestração no Maestri)  
-**Referências visuais:** 7 imagens na raiz do projeto (`/home/pablio_sousadev/Documentos/Tropical Fit web/*.jpg`)
+**Referências visuais:** Prints oficiais do Instagram da academia fornecidos como referência inicial
 
 ---
 

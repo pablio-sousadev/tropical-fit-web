@@ -20,8 +20,8 @@ export const ACADEMIA_DATA: AcademiaData = {
       '[PLACEHOLDER: URL do perfil/rota no Google Maps da unidade Água Quente]',
     googleMapsEmbedUrl:
       '[PLACEHOLDER: URL de embed do Google Maps (Maps > Compartilhar > Incorporar mapa)]',
-    whatsapp: '[PLACEHOLDER: https://wa.me/5561999999999?text=...]',
-    instagram: '[PLACEHOLDER: https://www.instagram.com/tropicalfit]',
+    whatsapp: 'https://wa.me/556185243521',
+    instagram: 'https://www.instagram.com/academiatropicalfit',
     scaAlunoCodigo: '05855850',
   },
 

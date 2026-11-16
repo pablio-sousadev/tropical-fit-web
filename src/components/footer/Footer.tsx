@@ -118,7 +118,7 @@ export function Footer() {
                 className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-brand-orange px-4 py-2 font-display text-sm font-black uppercase tracking-wider text-black hover:bg-brand-orange-hover"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                <span>WhatsApp Oficial</span>
+                <span>WhatsApp: (61) 8524-3521</span>
               </a>
 
               <a
@@ -128,7 +128,7 @@ export function Footer() {
                 className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-brand-dark-border bg-brand-dark-surface px-4 py-2 font-display text-sm font-black uppercase tracking-wider text-white hover:border-brand-orange hover:text-brand-orange"
               >
                 <Instagram className="h-4 w-4" aria-hidden="true" />
-                <span>Instagram</span>
+                <span>@academiatropicalfit</span>
               </a>
             </div>
           </div>

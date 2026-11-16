@@ -4,7 +4,7 @@
  * estiverem ativos na fonte de dados.
  */
 
-const DEFAULT_WHATSAPP_BASE = 'https://wa.me/5561999999999';
+const DEFAULT_WHATSAPP_BASE = 'https://wa.me/556185243521';
 const DEFAULT_WHATSAPP_MSG =
   'Olá! Vim pelo site da Academia Tropical Fit (Unidade Água Quente) e gostaria de mais informações sobre matrícula.';
 
@@ -22,37 +22,43 @@ export function getWhatsAppUrl(
   rawWhatsapp: string,
   customMessage?: string
 ): string {
-  const match = rawWhatsapp.match(/https:\/\/wa\.me\/\d+/);
-  const baseUrl = match
-    ? match[0]
-    : !isPlaceholderValue(rawWhatsapp) && rawWhatsapp.startsWith('http')
-      ? rawWhatsapp.split('?')[0]
-      : DEFAULT_WHATSAPP_BASE;
-
-  if (customMessage) {
-    return `${baseUrl}?text=${encodeURIComponent(customMessage)}`;
+  if (isPlaceholderValue(rawWhatsapp)) {
+    return `${DEFAULT_WHATSAPP_BASE}?text=${encodeURIComponent(
+      customMessage || DEFAULT_WHATSAPP_MSG
+    )}`;
   }
 
-  if (
-    !isPlaceholderValue(rawWhatsapp) &&
-    rawWhatsapp.startsWith('http') &&
-    rawWhatsapp.includes('?text=')
-  ) {
-    return rawWhatsapp;
+  const match = rawWhatsapp.match(/https:\/\/wa\.me\/(\d+)/);
+  let baseUrl = '';
+  if (match) {
+    baseUrl = `https://wa.me/${match[1]}`;
+  } else {
+    const digits = rawWhatsapp.replace(/\D/g, '');
+    if (digits.length >= 8) {
+      const fullDigits = digits.startsWith('55') ? digits : `55${digits}`;
+      baseUrl = `https://wa.me/${fullDigits}`;
+    } else {
+      baseUrl = DEFAULT_WHATSAPP_BASE;
+    }
   }
 
-  return `${baseUrl}?text=${encodeURIComponent(DEFAULT_WHATSAPP_MSG)}`;
+  const message = customMessage || DEFAULT_WHATSAPP_MSG;
+  return `${baseUrl}?text=${encodeURIComponent(message)}`;
 }
 
 export function getInstagramUrl(rawInstagram: string): string {
+  if (isPlaceholderValue(rawInstagram)) {
+    return 'https://www.instagram.com/academiatropicalfit';
+  }
   const match = rawInstagram.match(/https?:\/\/[^\s\]]+/);
   if (match) {
     return match[0];
   }
-  if (!isPlaceholderValue(rawInstagram) && rawInstagram.startsWith('@')) {
-    return `https://www.instagram.com/${rawInstagram.slice(1)}`;
+  const cleanHandle = rawInstagram.replace(/^@/, '').trim();
+  if (cleanHandle.length > 0) {
+    return `https://www.instagram.com/${cleanHandle}`;
   }
-  return 'https://www.instagram.com/tropicalfit';
+  return 'https://www.instagram.com/academiatropicalfit';
 }
 
 export function getGoogleMapsUrl(rawMapsUrl: string, endereco: string): string {

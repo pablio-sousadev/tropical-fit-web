@@ -27,3 +27,13 @@ pnpm-debug.log*
 *.pem
 *.tsbuildinfo
 .vercel
+
+# prints, referencias e temporarios
+/*.jpg
+/*.jpeg
+/*.png
+public/images/referencias/
+public/images/*_crop.png
+public/images/estrutura/*.jpeg
+SaveClip*
+*print*

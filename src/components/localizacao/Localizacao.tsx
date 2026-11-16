@@ -121,7 +121,7 @@ export function Localizacao() {
                   className="btn-tactile flex min-h-[50px] items-center justify-center gap-2 rounded-xl bg-brand-orange px-4 py-3 font-display text-base font-black uppercase tracking-wider text-black shadow-tactile hover:bg-brand-orange-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
                 >
                   <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>WhatsApp</span>
+                  <span>(61) 8524-3521</span>
                 </a>
 
                 <a
@@ -131,7 +131,7 @@ export function Localizacao() {
                   className="btn-tactile flex min-h-[50px] items-center justify-center gap-2 rounded-xl border border-brand-dark-border bg-brand-dark-surface px-4 py-3 font-display text-base font-black uppercase tracking-wider text-white hover:border-brand-orange hover:text-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
                 >
                   <Instagram className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>Instagram</span>
+                  <span>@academiatropicalfit</span>
                 </a>
               </div>
             </div>
