@@ -19,6 +19,7 @@ interface ZonaConfig {
   focoFisiologico: string;
   intensidade: string;
   icone: typeof Dumbbell;
+  foto: string;
   equipamentosBase: string[];
 }
 
@@ -30,6 +31,7 @@ const ZONAS_MAP: Record<string, ZonaConfig> = {
     focoFisiologico: 'Força Máxima & Densidade Muscular',
     intensidade: 'ALTA CARGA',
     icone: Dumbbell,
+    foto: '/images/estrutura/peso-livre.jpg',
     equipamentosBase: [
       'Máquinas articuladas e guiadas para isolamento de grandes e pequenos grupamentos',
       'Setor de peso livre com halteres pareados, barras olímpicas e anilhas calibradas',
@@ -44,6 +46,7 @@ const ZONAS_MAP: Record<string, ZonaConfig> = {
     focoFisiologico: 'Condicionamento Cardiovascular & Definição',
     intensidade: 'RITMO CONTÍNUO',
     icone: HeartPulse,
+    foto: '/images/estrutura/cardio.jpg',
     equipamentosBase: [
       'Esteiras profissionais de alto impacto para corrida intensa e caminhada inclinada',
       'Bicicletas ergométricas e spinning para treinos intervalados de alta rotação',
@@ -58,6 +61,7 @@ const ZONAS_MAP: Record<string, ZonaConfig> = {
     focoFisiologico: 'Potência Atlética, Coordenação & Gasto Energético',
     intensidade: 'EXPLOSIVO',
     icone: Flame,
+    foto: '/images/estrutura/funcional.jpg',
     equipamentosBase: [
       'Arena dedicada para Jump, Ritmos / Fit Dance, Funcional, Judô e Step',
       'Mini trampolins reforçados para sessões de Jump de alta queima calórica',
@@ -224,6 +228,18 @@ export function Aparelhos() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Foto Realista da Zona de Treino */}
+                    {config.foto ? (
+                      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-brand-dark-border bg-black shadow-lg">
+                        <img
+                          src={config.foto}
+                          alt={config.tituloArena}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark-card via-transparent to-transparent opacity-40" />
+                      </div>
+                    ) : null}
                   </div>
 
                   {/* Lista Técnica de Equipamentos em Grid 2 Colunas (7 cols) */}

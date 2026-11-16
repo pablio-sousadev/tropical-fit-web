@@ -172,8 +172,26 @@ export function AppAluno() {
               </div>
             </div>
 
-            {/* Coluna Direita: Credencial Digital do Atleta com Moldura de Leitor de Acesso (5 cols) */}
-            <div className="lg:col-span-5">
+            {/* Coluna Direita: Foto Real do App + Credencial Digital do Atleta */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Foto do App em Uso na Academia */}
+              <div className="relative overflow-hidden rounded-2xl border border-brand-dark-border bg-brand-dark shadow-xl">
+                <img
+                  src="/images/estrutura/app.jpg"
+                  alt="Aluno da Tropical Fit acompanhando treino no App SCA Aluno"
+                  className="w-full h-44 sm:h-52 object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/30 to-transparent" />
+                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                  <span className="rounded bg-black/85 backdrop-blur-sm px-2.5 py-1 font-display text-[11px] font-black uppercase tracking-wider text-brand-orange border border-brand-orange/40">
+                    SCA ALUNO EM AÇÃO
+                  </span>
+                  <span className="font-mono text-[10px] font-bold text-stone-300">
+                    CÓDIGO: {codigo}
+                  </span>
+                </div>
+              </div>
+
               <div className="relative overflow-hidden rounded-2xl border-2 border-brand-orange bg-brand-dark p-6 sm:p-8 shadow-orange-glow">
                 {/* Header da Credencial */}
                 <div className="flex items-center justify-between gap-2 border-b border-brand-dark-border pb-4 mb-6">

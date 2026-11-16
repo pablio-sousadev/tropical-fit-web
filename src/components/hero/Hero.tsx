@@ -47,9 +47,21 @@ export function Hero() {
       aria-labelledby="hero-heading"
       className="relative overflow-hidden bg-brand-dark scenic-spotlight pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-28 border-b border-brand-dark-border"
     >
+      {/* Background Cinematográfico da Academia */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <img
+          src="/images/estrutura/hero.jpg"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center opacity-25 scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0C0A09] via-[#0C0A09]/95 to-[#0C0A09]/75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0C0A09] via-transparent to-[#0C0A09]/85" />
+      </div>
+
       {/* Malha estrutural de arena */}
       <div
-        className="pointer-events-none absolute inset-0 scenic-grid opacity-80"
+        className="pointer-events-none absolute inset-0 scenic-grid opacity-80 z-0"
         aria-hidden="true"
       />
 

@@ -20,6 +20,17 @@ const DIAS_SEMANA: Array<{
   { id: 'Sexta', curto: 'SEX', completo: 'Sexta-feira', canal: 'DIA 05' },
 ];
 
+function getModalidadeFoto(modalidade: string): string {
+  const lower = modalidade.toLowerCase();
+  if (lower.includes('jump')) return '/images/estrutura/jump.jpg';
+  if (lower.includes('ritmos') || lower.includes('dance'))
+    return '/images/estrutura/ritmos.jpg';
+  if (lower.includes('funcional')) return '/images/estrutura/funcional.jpg';
+  if (lower.includes('judô')) return '/images/estrutura/judo.jpg';
+  if (lower.includes('step')) return '/images/estrutura/sala-coletiva.jpg';
+  return '/images/estrutura/sala-coletiva.jpg';
+}
+
 function getModalidadeBadge(modalidade: string): {
   tag: string;
   intensidade: string;
@@ -154,21 +165,28 @@ export function AulasColetivas() {
                   key={aula.id}
                   className="group grid grid-cols-1 md:grid-cols-12 items-center gap-4 sm:gap-6 p-5 sm:p-7 transition-colors hover:bg-brand-dark-surface/70"
                 >
-                  {/* Horário Digital de Arena (3 cols) */}
-                  <div className="md:col-span-3 flex items-center gap-3.5">
+                  {/* Horário Digital de Arena + Miniatura da Modalidade (4 cols) */}
+                  <div className="md:col-span-4 flex items-center gap-3">
                     <span className="font-mono text-xs font-bold text-stone-500 tabular-nums">
                       0{idx + 1}
                     </span>
-                    <div className="inline-flex items-center gap-2 rounded-xl border-2 border-brand-orange bg-brand-orange px-4 py-2 text-black shadow-orange-glow-sm">
-                      <Clock className="h-5 w-5 shrink-0 stroke-[2.5]" aria-hidden="true" />
-                      <span className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight leading-none tabular-nums">
+                    <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl border border-brand-dark-border bg-black">
+                      <img
+                        src={getModalidadeFoto(aula.modalidade)}
+                        alt={aula.modalidade}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border-2 border-brand-orange bg-brand-orange px-3 py-1.5 sm:px-3.5 sm:py-2 text-black shadow-orange-glow-sm">
+                      <Clock className="h-4 w-4 shrink-0 stroke-[2.5]" aria-hidden="true" />
+                      <span className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight leading-none tabular-nums">
                         {aula.horario}H
                       </span>
                     </div>
                   </div>
 
-                  {/* Modalidade & Badge Esportiva (6 cols) */}
-                  <div className="md:col-span-6 space-y-1.5">
+                  {/* Modalidade & Badge Esportiva (5 cols) */}
+                  <div className="md:col-span-5 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded bg-brand-orange/15 px-2.5 py-0.5 font-display text-xs font-black uppercase tracking-widest text-brand-orange">
                         {badge.tag}
