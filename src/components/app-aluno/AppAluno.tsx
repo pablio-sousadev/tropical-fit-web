@@ -58,10 +58,8 @@ export function AppAluno() {
         setCopiado(false);
       }, 2500);
     } catch {
-      setCopiado(true);
-      window.setTimeout(() => {
-        setCopiado(false);
-      }, 2500);
+      // Em caso de falha no clipboard, não exibe confirmação indevida
+      setCopiado(false);
     }
   }, [codigo]);
 

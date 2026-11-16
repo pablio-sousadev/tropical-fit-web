@@ -7,9 +7,6 @@ export function JsonLd() {
   const instagramUrl = getInstagramUrl(unidade.instagram);
   const mapsUrl = getGoogleMapsUrl(unidade.googleMapsUrl, unidade.endereco);
 
-  const lat = unidade.coordenadas?.lat ?? -15.8856;
-  const lng = unidade.coordenadas?.lng ?? -48.2412;
-
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'ExerciseGym',
@@ -28,11 +25,15 @@ export function JsonLd() {
       addressRegion: 'DF',
       addressCountry: 'BR',
     },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: lat,
-      longitude: lng,
-    },
+    ...(unidade.coordenadas
+      ? {
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: unidade.coordenadas.lat,
+            longitude: unidade.coordenadas.lng,
+          },
+        }
+      : {}),
     hasMap: mapsUrl,
     openingHoursSpecification: [
       {
