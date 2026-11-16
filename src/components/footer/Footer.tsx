@@ -30,27 +30,11 @@ export function Footer() {
           {/* Coluna 1: Identidade da Marca */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-orange text-black font-black shadow-orange-glow-sm">
-                <svg
-                  viewBox="0 0 40 40"
-                  className="h-6 w-6 fill-current"
-                  aria-hidden="true"
-                >
-                  <circle cx="20" cy="20" r="9" className="opacity-25" />
-                  <path d="M5 17h3v6H5v-6zm3-2h3v10H8V15zm21 0h3v10h-3V15zm3 2h3v6h-3v-6zM11 18.5h18v3H11v-3z" />
-                </svg>
-              </div>
-              <div className="leading-none">
-                <span className="block text-[10px] font-bold uppercase tracking-[0.22em] text-stone-400">
-                  Academia
-                </span>
-                <span className="font-display text-2xl font-black uppercase tracking-tight text-white">
-                  TROPICAL{' '}
-                </span>
-                <span className="font-display text-2xl font-black italic text-brand-orange">
-                  FIT
-                </span>
-              </div>
+              <img
+                src="/images/logo-official.png"
+                alt="Academia Tropical Fit - Logo Oficial"
+                className="h-12 sm:h-14 w-auto object-contain"
+              />
             </div>
 
             <p className="text-sm text-stone-400 leading-relaxed max-w-sm">

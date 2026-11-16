@@ -46,6 +46,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: unidade.nome }],
   creator: unidade.nome,
+  icons: {
+    icon: '/images/logo-icon.png',
+    apple: '/images/logo-icon.png',
+  },
   robots: {
     index: true,
     follow: true,

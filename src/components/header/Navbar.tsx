@@ -72,36 +72,21 @@ export function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 sm:h-20 items-center justify-between gap-2">
-          {/* Logo Tropical Fit */}
+          {/* Logo Oficial Tropical Fit */}
           <a
             href="#"
             onClick={closeMenu}
-            className="group flex items-center gap-2.5 sm:gap-3 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange rounded-lg shrink-0"
+            className="group flex items-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange rounded-lg shrink-0"
             aria-label={`${unidade.nome} - ${unidade.unidade} (Voltar ao topo)`}
           >
-            <div className="relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-brand-orange text-black font-black shadow-orange-glow-sm transition-transform duration-200 group-hover:scale-105">
-              <svg
-                viewBox="0 0 40 40"
-                className="h-7 w-7 fill-current"
-                aria-hidden="true"
-              >
-                <circle cx="20" cy="20" r="9" className="opacity-25" />
-                <path d="M5 17h3v6H5v-6zm3-2h3v10H8V15zm21 0h3v10h-3V15zm3 2h3v6h-3v-6zM11 18.5h18v3H11v-3z" />
-              </svg>
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-stone-400">
-                Academia
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
-                  TROPICAL
-                </span>
-                <span className="font-display text-xl sm:text-2xl font-black italic text-brand-orange">
-                  FIT
-                </span>
-              </div>
-            </div>
+            <img
+              src="/images/logo-official.png"
+              alt="Academia Tropical Fit - Logo Oficial"
+              className="h-10 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+            />
+            <span className="hidden sm:inline-block font-display text-xs font-bold uppercase tracking-widest text-stone-400 border-l border-stone-800 pl-2.5 ml-1">
+              {unidade.unidade}
+            </span>
           </a>
 
           {/* Links Desktop */}

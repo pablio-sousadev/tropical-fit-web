@@ -65,13 +65,20 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Coluna Esquerda: Manchete Imponente + Placas de Peso + CTAs Táteis */}
           <div className="lg:col-span-7 space-y-7 sm:space-y-8">
-            {/* Kicker de Arena */}
-            <div className="inline-flex flex-wrap items-center gap-2.5 rounded-md border border-brand-orange/40 bg-brand-dark-surface px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-brand-orange">
-              <span className="h-2 w-2 rounded-full bg-brand-orange" aria-hidden="true" />
-              <span>{unidade.unidade} · ALTA PERFORMANCE</span>
-              <span className="text-stone-400 hidden sm:inline">
-                // SH ÁGUA QUENTE
-              </span>
+            {/* Logo Oficial + Kicker de Arena */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <img
+                src="/images/logo-official.png"
+                alt="Logo Oficial Academia Tropical Fit"
+                className="h-12 sm:h-14 w-auto object-contain self-start"
+              />
+              <div className="inline-flex flex-wrap items-center gap-2.5 rounded-md border border-brand-orange/40 bg-brand-dark-surface px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-brand-orange">
+                <span className="h-2 w-2 rounded-full bg-brand-orange" aria-hidden="true" />
+                <span>{unidade.unidade} · ALTA PERFORMANCE</span>
+                <span className="text-stone-400 hidden sm:inline">
+                  // SH ÁGUA QUENTE
+                </span>
+              </div>
             </div>
 
             {/* Manchete Display 900 com Contraste Radical (3x-5x) */}
