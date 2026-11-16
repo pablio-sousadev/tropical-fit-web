@@ -1,7 +1,22 @@
 import type { Metadata, Viewport } from 'next';
+import { Barlow, Barlow_Condensed } from 'next/font/google';
 import { ACADEMIA_DATA } from '@/data/academia';
 import { JsonLd } from '@/components/seo/JsonLd';
 import './globals.css';
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['700', '800', '900'],
+  variable: '--font-condensed',
+  display: 'swap',
+});
+
+const barlow = Barlow({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 const { unidade } = ACADEMIA_DATA;
 
@@ -9,7 +24,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#0A0A0A',
+  themeColor: '#0C0A09',
 };
 
 export const metadata: Metadata = {
@@ -66,11 +81,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="dark scroll-smooth">
+    <html
+      lang="pt-BR"
+      className={`dark scroll-smooth ${barlowCondensed.variable} ${barlow.variable}`}
+    >
       <head>
         <JsonLd />
       </head>
-      <body className="min-h-screen bg-brand-dark text-neutral-100 antialiased selection:bg-brand-orange selection:text-black overflow-x-hidden">
+      <body className="min-h-screen bg-brand-dark font-sans text-stone-100 antialiased selection:bg-brand-orange selection:text-black overflow-x-hidden">
         {children}
       </body>
     </html>

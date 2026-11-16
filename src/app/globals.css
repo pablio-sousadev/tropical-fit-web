@@ -15,25 +15,25 @@
   }
 
   body {
-    @apply bg-brand-dark text-white antialiased;
+    @apply bg-brand-dark text-stone-100 font-sans antialiased;
     overflow-x: hidden;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-kerning: normal;
   }
 
-  /* Custom scrollbar sutil na identidade escura/laranja */
+  /* Custom scrollbar na paleta de calor de atrito */
   ::-webkit-scrollbar {
     width: 10px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #0a0a0a;
+    background: #0c0a09;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #262626;
+    background: #2d2622;
     border-radius: 9999px;
-    border: 2px solid #0a0a0a;
+    border: 2px solid #0c0a09;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -53,6 +53,48 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /* Iluminação cenográfica de arena (spots radiais âmbar/laranja profundo) */
+  .scenic-spotlight {
+    background-image:
+      radial-gradient(
+        circle at 82% 14%,
+        rgba(255, 107, 0, 0.22) 0%,
+        rgba(255, 85, 0, 0.07) 36%,
+        transparent 68%
+      ),
+      radial-gradient(
+        circle at 12% 85%,
+        rgba(251, 191, 36, 0.09) 0%,
+        transparent 52%
+      );
+  }
+
+  .scenic-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Botão tátil esportivo com micro-elevação exponencial */
+  .btn-tactile {
+    transition:
+      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .btn-tactile:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-tactile:active {
+    transform: translateY(1px);
   }
 }
 

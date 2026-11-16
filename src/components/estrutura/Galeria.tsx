@@ -30,26 +30,26 @@ export function Galeria() {
     <section
       id="estrutura"
       aria-labelledby="estrutura-heading"
-      className="py-16 sm:py-24 bg-brand-dark border-b border-brand-dark-border"
+      className="py-20 sm:py-28 bg-brand-dark border-b border-brand-dark-border"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Cabeçalho da Seção */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 sm:mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 sm:mb-14">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-brand-orange">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-brand-orange">
               <Camera className="h-4 w-4" aria-hidden="true" />
-              <span>Conheça o Espaço</span>
+              <span>Tour pela Arena</span>
             </div>
             <h2
               id="estrutura-heading"
-              className="text-[clamp(1.75rem,3.8vw,3rem)] font-black uppercase tracking-tight text-white leading-tight"
+              className="font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-black uppercase tracking-tight text-white leading-[0.93]"
             >
-              Estrutura preparada para o seu{' '}
-              <span className="text-brand-orange">melhor treino</span>
+              ESTRUTURA DE <span className="text-brand-orange">IMPACTO</span>{' '}
+              PARA O SEU TREINO
             </h2>
-            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
-              Ambientes amplos, ventilados e organizados por área de treino na{' '}
-              {unidade.unidade}. Clique em qualquer foto para ampliar.
+            <p className="text-base sm:text-lg text-stone-300 leading-relaxed">
+              Ambientes amplos, ventilados e organizados por área de performance
+              na {unidade.unidade}. Clique em qualquer foto para ampliar.
             </p>
           </div>
 
@@ -71,10 +71,10 @@ export function Galeria() {
                     setSelectedIndex(null);
                     setCategoriaAtiva(cat);
                   }}
-                  className={`inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                  className={`btn-tactile inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl px-4 py-2 font-display text-sm sm:text-base font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
                     isSelected
-                      ? 'bg-brand-orange text-black shadow-md shadow-brand-orange/20'
-                      : 'border border-brand-dark-border bg-brand-dark-card text-neutral-300 hover:border-brand-orange/60 hover:text-white'
+                      ? 'bg-brand-orange text-black shadow-orange-glow-sm'
+                      : 'border border-brand-dark-border bg-brand-dark-surface text-stone-300 hover:border-brand-orange/60 hover:text-white'
                   }`}
                 >
                   {cat}
@@ -87,19 +87,18 @@ export function Galeria() {
         {/* Grid Responsivo (1 col mobile, 2 col tablet, 3-4 cols desktop) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {fotosFiltradas.map((foto, index) => {
-            const isFeatured =
-              categoriaAtiva === 'Todas' && index === 0;
+            const isFeatured = categoriaAtiva === 'Todas' && index === 0;
             return (
               <button
                 key={foto.id}
                 type="button"
                 onClick={() => setSelectedIndex(index)}
                 aria-label={`Ampliar foto: ${foto.titulo} (${foto.categoria})`}
-                className={`group relative flex flex-col overflow-hidden rounded-2xl border border-brand-dark-border bg-brand-dark-card text-left transition-all duration-200 hover:border-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                className={`group relative flex flex-col overflow-hidden rounded-2xl border-2 border-brand-dark-border bg-brand-dark-card text-left transition-all duration-200 hover:border-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
                   isFeatured ? 'sm:col-span-2 lg:col-span-2' : ''
                 }`}
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-900">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-brand-dark">
                   <img
                     src={foto.url}
                     alt={foto.alt}
@@ -108,10 +107,10 @@ export function Galeria() {
                     height={375}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
                   {/* Selo de Categoria */}
-                  <span className="absolute top-3 left-3 rounded-md bg-black/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-brand-orange border border-brand-orange/30">
+                  <span className="absolute top-3 left-3 rounded bg-brand-dark/90 px-2.5 py-1 font-display text-xs font-black uppercase tracking-widest text-brand-orange border border-brand-orange/40">
                     {foto.categoria}
                   </span>
 
@@ -125,10 +124,10 @@ export function Galeria() {
 
                   {/* Título e Descrição Curta */}
                   <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5">
-                    <h3 className="text-base sm:text-lg font-black uppercase tracking-tight text-white group-hover:text-brand-orange transition-colors">
+                    <h3 className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-white group-hover:text-brand-orange transition-colors">
                       {foto.titulo}
                     </h3>
-                    <p className="mt-1 line-clamp-2 text-xs text-neutral-300">
+                    <p className="mt-1 line-clamp-2 text-xs text-stone-300">
                       {foto.alt}
                     </p>
                   </div>

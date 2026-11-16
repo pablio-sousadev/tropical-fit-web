@@ -1,9 +1,10 @@
 import {
   Check,
   MessageCircle,
-  Gift,
-  Sparkles,
+  Ticket,
+  Flame,
   ShieldCheck,
+  TrendingDown,
 } from 'lucide-react';
 import { ACADEMIA_DATA } from '@/data/academia';
 import {
@@ -15,73 +16,115 @@ import {
 export function Planos() {
   const { planos, campanha, unidade } = ACADEMIA_DATA;
 
+  const planoMensal = planos.find((p) => p.periodoMeses === 1) ?? planos[0];
+
   const subtituloCampanha =
     campanha.subtitulo && !isPlaceholderValue(campanha.subtitulo)
       ? campanha.subtitulo
-      : 'Matricule-se ou renove seu plano na Unidade Água Quente e aproveite condições especiais.';
+      : 'Apresente este ticket pelo WhatsApp ou na recepção da Unidade Água Quente para ativar sua condição especial.';
 
   return (
     <section
       id="planos"
       aria-labelledby="planos-heading"
-      className="py-16 sm:py-24 bg-brand-dark border-b border-brand-dark-border"
+      className="relative py-20 sm:py-28 bg-brand-dark scenic-spotlight border-b border-brand-dark-border overflow-hidden"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Cabeçalho da Seção */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-brand-orange">
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
-            <span>Transparência Total</span>
+        {/* Cabeçalho da Seção com Escala Condensada 900 */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 sm:mb-16">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-brand-orange">
+              <Flame className="h-4 w-4" aria-hidden="true" />
+              <span>Passaporte de Treino</span>
+            </div>
+            <h2
+              id="planos-heading"
+              className="font-display text-[clamp(2.5rem,5.8vw,4.75rem)] font-black uppercase tracking-tight text-white leading-[0.93]"
+            >
+              INVISTA NA SUA <span className="text-brand-orange">FORÇA.</span>{' '}
+              PREÇOS ABERTOS.
+            </h2>
           </div>
-          <h2
-            id="planos-heading"
-            className="text-[clamp(1.85rem,4vw,3.25rem)] font-black uppercase tracking-tight text-white leading-tight"
-          >
-            Planos com <span className="text-brand-orange">Valores Abertos</span>
-          </h2>
-          <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
-            Escolha o plano ideal para sua rotina. Todos incluem musculação,
-            cardio, peso livre, aulas coletivas e acesso ao App SCA Aluno.
+          <p className="text-base sm:text-lg text-stone-300 max-w-md leading-relaxed">
+            Sem letras miúdas: todos os planos liberam musculação, peso livre,
+            cardio, aulas coletivas e o App SCA Aluno.
           </p>
         </div>
 
-        {/* Banner de Campanha Sazonal (renderizado se campanha.ativa === true) */}
+        {/* Banner Sazonal em Formato de Ticket / Credencial VIP Esportivo */}
         {campanha.ativa ? (
-          <div className="mb-10 sm:mb-12 rounded-2xl border-2 border-brand-orange bg-brand-orange text-black p-5 sm:p-7 shadow-xl shadow-brand-orange/15">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 rounded-md bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-brand-yellow">
-                  <Gift className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>{campanha.badge}</span>
+          <div className="relative mb-14 overflow-hidden rounded-2xl border-2 border-brand-orange bg-brand-dark-surface shadow-orange-glow">
+            {/* Recortes laterais de Ticket / Ingresso */}
+            <div
+              className="hidden md:block pointer-events-none absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full border-2 border-brand-orange bg-brand-dark"
+              aria-hidden="true"
+            />
+            <div
+              className="hidden md:block pointer-events-none absolute -right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full border-2 border-brand-orange bg-brand-dark"
+              aria-hidden="true"
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+              {/* Corpo Principal do Ticket VIP (8 cols) */}
+              <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded bg-brand-orange px-3 py-1 font-display text-xs font-black uppercase tracking-widest text-black">
+                    <Ticket className="h-3.5 w-3.5" aria-hidden="true" />
+                    {campanha.badge}
+                  </span>
+                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-brand-yellow">
+                    CREDENCIAL VIP // BLACK-FIT-AQ
+                  </span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-black">
-                  {campanha.titulo}: {campanha.brindeOuDesconto}
+
+                <h3 className="font-display text-3xl sm:text-5xl font-black uppercase tracking-tight text-white leading-[0.95]">
+                  {campanha.titulo}:{' '}
+                  <span className="text-brand-orange">
+                    {campanha.brindeOuDesconto}
+                  </span>
                 </h3>
-                <p className="text-sm sm:text-base font-semibold text-black/85 max-w-2xl">
+
+                <p className="text-sm sm:text-base text-stone-300 max-w-2xl leading-relaxed">
                   {subtituloCampanha}
                 </p>
               </div>
 
-              <div className="shrink-0">
-                <a
-                  href={getWhatsAppUrl(
-                    unidade.whatsapp,
-                    `Olá! Quero aproveitar a campanha ${campanha.titulo} na Academia Tropical Fit - ${unidade.unidade}.`
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-black px-6 py-3 text-xs sm:text-sm font-black uppercase tracking-wider text-white hover:bg-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                >
-                  <MessageCircle className="h-4 w-4 text-brand-orange" aria-hidden="true" />
-                  <span>Garantir Condição no WhatsApp</span>
-                </a>
+              {/* Canhoto Destacável do Ticket (4 cols) */}
+              <div className="lg:col-span-4 flex flex-col justify-between border-t-2 lg:border-t-0 lg:border-l-2 border-dashed border-brand-orange/50 bg-brand-dark-card p-6 sm:p-8">
+                <div className="space-y-1">
+                  <span className="block font-mono text-[11px] font-bold uppercase tracking-widest text-stone-400">
+                    UNIDADE VÁLIDA
+                  </span>
+                  <span className="block font-display text-xl font-black uppercase text-white">
+                    {unidade.unidade} · DF 280
+                  </span>
+                </div>
+
+                <div className="my-4">
+                  <a
+                    href={getWhatsAppUrl(
+                      unidade.whatsapp,
+                      `Olá! Quero resgatar o ticket da campanha ${campanha.titulo} na Academia Tropical Fit - ${unidade.unidade}.`
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-brand-orange px-5 py-3.5 font-display text-base sm:text-lg font-black uppercase tracking-wider text-black shadow-tactile hover:bg-brand-orange-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  >
+                    <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span>Resgatar Ticket no WhatsApp</span>
+                  </a>
+                </div>
+
+                <span className="block font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  AUTENTICAÇÃO // SCA-{unidade.scaAlunoCodigo}
+                </span>
               </div>
             </div>
           </div>
         ) : null}
 
-        {/* Grid de 3 Cards de Planos */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+        {/* Grid de Planos com Card Semestral Heroico Dominante */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch pt-2">
           {planos.map((plano) => {
             const preco = formatPrecoParts(plano.precoMensal);
             const isDestaque = plano.destaque;
@@ -90,99 +133,139 @@ export function Planos() {
               plano.mensagemWhatsApp
             );
 
+            // Cálculo dinâmico de economia em relação ao plano mensal
+            const economiaTotal =
+              plano.periodoMeses > 1
+                ? (planoMensal.precoMensal - plano.precoMensal) *
+                  plano.periodoMeses
+                : 0;
+            const economiaFormatada =
+              economiaTotal > 0
+                ? `R$ ${economiaTotal.toFixed(2).replace('.', ',')}`
+                : null;
+
             return (
               <article
                 key={plano.id}
-                className={`relative flex flex-col justify-between rounded-2xl p-6 sm:p-8 transition-all duration-200 ${
+                className={`relative flex flex-col justify-between rounded-2xl transition-all duration-200 ${
                   isDestaque
-                    ? 'border-2 border-brand-orange bg-[#17120E] shadow-2xl shadow-brand-orange/15 lg:-translate-y-2'
-                    : 'border border-brand-dark-border bg-brand-dark-card hover:border-neutral-700'
+                    ? 'z-10 border-2 border-brand-orange bg-brand-dark-surface p-7 sm:p-9 shadow-orange-glow lg:-my-3'
+                    : 'border border-brand-dark-border bg-brand-dark-card p-6 sm:p-8 hover:border-stone-600'
                 }`}
+                style={
+                  isDestaque
+                    ? {
+                        backgroundImage:
+                          'radial-gradient(circle at 90% 10%, rgba(255, 107, 0, 0.24), transparent 55%)',
+                      }
+                    : undefined
+                }
               >
-                {/* Selo de Melhor Custo-Benefício */}
-                {isDestaque || plano.badge ? (
-                  <div className="mb-4 flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1 text-xs font-black uppercase tracking-wider text-black">
-                      ★ {plano.badge ?? 'Melhor Custo-Benefício'}
-                    </span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow">
-                      Mais Escolhido
-                    </span>
-                  </div>
-                ) : (
-                  <div className="mb-4">
-                    <span className="inline-block rounded-full border border-brand-dark-border bg-brand-dark px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
-                      Contrato de {plano.periodoMeses}{' '}
-                      {plano.periodoMeses === 1 ? 'mês' : 'meses'}
-                    </span>
-                  </div>
-                )}
-
                 <div className="space-y-6">
-                  {/* Nome do Plano e Preço */}
-                  <div>
-                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
-                      Plano {plano.nome}
+                  {/* Topo do Card: Badge & Duração */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    {isDestaque ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-orange px-3.5 py-1 font-display text-sm font-black uppercase tracking-wider text-black shadow-orange-glow-sm">
+                        ★ {plano.badge ?? 'MELHOR CUSTO-BENEFÍCIO'}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-md border border-brand-dark-border bg-brand-dark px-3 py-1 font-display text-xs font-black uppercase tracking-widest text-stone-300">
+                        CICLO DE {plano.periodoMeses}{' '}
+                        {plano.periodoMeses === 1 ? 'MÊS' : 'MESES'}
+                      </span>
+                    )}
+
+                    {economiaFormatada ? (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-brand-yellow/40 bg-brand-yellow/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-brand-yellow tabular-nums">
+                        <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
+                        Economize {economiaFormatada}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {/* Nome e Preço Display */}
+                  <div className="border-b border-brand-dark-border pb-6">
+                    <h3
+                      className={`font-display font-black uppercase tracking-tight text-white leading-none ${
+                        isDestaque
+                          ? 'text-4xl sm:text-5xl'
+                          : 'text-3xl sm:text-4xl'
+                      }`}
+                    >
+                      PLANO {plano.nome}
                     </h3>
-                    <p className="mt-1 text-xs sm:text-sm text-neutral-400">
+                    <p className="mt-2 text-xs sm:text-sm text-stone-400">
                       {plano.periodoMeses === 1
-                        ? 'Renovação mensal flexível'
-                        : `Compromisso de ${plano.periodoMeses} meses (${plano.periodoMeses}x de ${preco.completo})`}
+                        ? 'Flexibilidade mês a mês sem fidelidade longa'
+                        : `Contrato de ${plano.periodoMeses} meses (${plano.periodoMeses}x de ${preco.completo})`}
                     </p>
 
-                    <div className="mt-5 flex items-baseline gap-1">
-                      <span className="text-base font-bold text-brand-orange">
+                    <div className="mt-6 flex items-baseline gap-1 tabular-nums">
+                      <span className="font-display text-xl font-black text-brand-orange">
                         R$
                       </span>
-                      <span className="text-5xl sm:text-6xl font-black tracking-tight text-white">
+                      <span
+                        className={`font-display font-black leading-none tracking-tight text-white ${
+                          isDestaque
+                            ? 'text-6xl sm:text-7xl'
+                            : 'text-5xl sm:text-6xl'
+                        }`}
+                      >
                         {preco.reais}
                       </span>
-                      <span className="text-2xl font-black text-brand-orange">
+                      <span className="font-display text-3xl font-black text-brand-orange">
                         {preco.centavos}
                       </span>
-                      <span className="text-sm font-semibold text-neutral-400 ml-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-stone-400 ml-1">
                         /mês
                       </span>
                     </div>
+
+                    {economiaFormatada ? (
+                      <p className="mt-2 text-xs font-semibold text-brand-yellow">
+                        Equivale a {economiaFormatada} de desconto acumulado no
+                        período em comparação ao plano Mensal.
+                      </p>
+                    ) : null}
                   </div>
 
-                  {/* Lista de Benefícios */}
-                  <ul className="space-y-3 border-t border-brand-dark-border pt-5">
+                  {/* Benefícios */}
+                  <ul className="space-y-3.5">
                     {plano.beneficios.map((beneficio) => (
                       <li
                         key={beneficio}
-                        className="flex items-start gap-3 text-sm text-neutral-200"
+                        className="flex items-start gap-3 text-sm sm:text-base text-stone-200"
                       >
                         <span
-                          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded ${
                             isDestaque
                               ? 'bg-brand-orange text-black'
-                              : 'bg-brand-orange/20 text-brand-orange'
+                              : 'bg-brand-dark-surface border border-brand-orange/50 text-brand-orange'
                           }`}
                           aria-hidden="true"
                         >
                           <Check className="h-3.5 w-3.5 stroke-[3]" />
                         </span>
-                        <span>{beneficio}</span>
+                        <span className="font-medium">{beneficio}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* CTA WhatsApp Específico do Plano */}
+                {/* Botão CTA Tátil */}
                 <div className="mt-8 pt-4">
                   <a
                     href={whatsappPlanoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                    className={`btn-tactile flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-display text-base sm:text-lg font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
                       isDestaque
-                        ? 'bg-brand-orange text-black hover:bg-brand-orange-hover shadow-lg shadow-brand-orange/25'
-                        : 'border-2 border-brand-orange text-white hover:bg-brand-orange hover:text-black'
+                        ? 'bg-brand-orange text-black shadow-tactile hover:bg-brand-orange-hover'
+                        : 'border-2 border-brand-orange bg-brand-dark text-white hover:bg-brand-orange hover:text-black'
                     }`}
                   >
-                    <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>Quero o Plano {plano.nome}</span>
+                    <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span>Assinar Plano {plano.nome}</span>
                   </a>
                 </div>
               </article>
@@ -190,12 +273,16 @@ export function Planos() {
           })}
         </div>
 
-        {/* Rodapé informativo de confiança */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-center text-xs sm:text-sm text-neutral-400">
-          <ShieldCheck className="h-4 w-4 text-brand-orange shrink-0" aria-hidden="true" />
+        {/* Nota de Rodapé */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-2 text-center text-xs sm:text-sm text-stone-400">
+          <ShieldCheck
+            className="h-4 w-4 text-brand-orange shrink-0"
+            aria-hidden="true"
+          />
           <span>
-            Atendimento rápido pelo WhatsApp ou presencialmente na recepção da{' '}
-            <strong className="text-white">{unidade.unidade}</strong>.
+            Matrícula imediata na recepção da{' '}
+            <strong className="text-white">{unidade.unidade}</strong> (DF 280,
+            KM 3) ou pelo atendimento rápido no WhatsApp.
           </span>
         </div>
       </div>

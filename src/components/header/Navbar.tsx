@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Menu, X, MessageCircle, MapPin, Clock, ArrowUpRight } from 'lucide-react';
+import {
+  Menu,
+  X,
+  MessageCircle,
+  MapPin,
+  Clock,
+  ArrowUpRight,
+} from 'lucide-react';
 import { ACADEMIA_DATA } from '@/data/academia';
 import { getWhatsAppUrl } from '@/lib/links';
 
@@ -59,8 +66,8 @@ export function Navbar() {
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-colors duration-200 ${
         scrolled || isOpen
-          ? 'bg-brand-dark/95 backdrop-blur-md border-b border-brand-dark-border shadow-lg shadow-black/50'
-          : 'bg-brand-dark/80 backdrop-blur-sm border-b border-white/10'
+          ? 'bg-brand-dark/95 backdrop-blur-md border-b border-brand-dark-border shadow-lg shadow-black/60'
+          : 'bg-brand-dark/85 backdrop-blur-sm border-b border-brand-dark-border/70'
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -72,8 +79,7 @@ export function Navbar() {
             className="group flex items-center gap-2.5 sm:gap-3 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange rounded-lg shrink-0"
             aria-label={`${unidade.nome} - ${unidade.unidade} (Voltar ao topo)`}
           >
-            <div className="relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-brand-orange text-black font-black shadow-md shadow-brand-orange/20 transition-transform duration-200 group-hover:scale-105">
-              {/* Emblema Sol + Barra inspirado na marca */}
+            <div className="relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-brand-orange text-black font-black shadow-orange-glow-sm transition-transform duration-200 group-hover:scale-105">
               <svg
                 viewBox="0 0 40 40"
                 className="h-7 w-7 fill-current"
@@ -84,20 +90,17 @@ export function Navbar() {
               </svg>
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-stone-400">
                 Academia
               </span>
               <div className="flex items-baseline gap-1">
-                <span className="text-base sm:text-lg font-black uppercase tracking-tight text-white">
+                <span className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
                   TROPICAL
                 </span>
-                <span className="text-base sm:text-lg font-black italic text-brand-orange">
+                <span className="font-display text-xl sm:text-2xl font-black italic text-brand-orange">
                   FIT
                 </span>
               </div>
-              <span className="text-[10px] font-medium text-neutral-400 hidden xs:inline">
-                Água Quente · DF 280
-              </span>
             </div>
           </a>
 
@@ -110,7 +113,7 @@ export function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="inline-flex min-h-[44px] items-center px-3.5 py-2 text-sm font-semibold text-neutral-300 hover:text-brand-orange transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                className="inline-flex min-h-[44px] items-center px-3.5 py-2 font-display text-base font-bold uppercase tracking-wider text-stone-300 hover:text-brand-orange transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
               >
                 {link.label}
               </a>
@@ -123,7 +126,7 @@ export function Navbar() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-brand-orange px-3.5 sm:px-5 py-2.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-black hover:bg-brand-orange-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
+              className="btn-tactile inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-brand-orange px-3.5 sm:px-5 py-2 font-display text-sm sm:text-base font-black uppercase tracking-wider text-black shadow-orange-glow-sm hover:bg-brand-orange-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
             >
               <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Matricule-se</span>
@@ -135,8 +138,10 @@ export function Navbar() {
               onClick={() => setIsOpen((prev) => !prev)}
               aria-expanded={isOpen}
               aria-controls="mobile-nav-drawer"
-              aria-label={isOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
-              className="inline-flex lg:hidden min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-brand-dark-border bg-brand-dark-card text-white hover:border-brand-orange hover:text-brand-orange transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+              aria-label={
+                isOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'
+              }
+              className="inline-flex lg:hidden min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-brand-dark-border bg-brand-dark-surface text-white hover:border-brand-orange hover:text-brand-orange transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
             >
               {isOpen ? (
                 <X className="h-6 w-6" aria-hidden="true" />
@@ -175,30 +180,40 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={closeMenu}
-                  className="flex min-h-[48px] items-center justify-between rounded-lg border border-brand-dark-border bg-brand-dark-card px-4 py-3 text-base font-bold text-white hover:border-brand-orange hover:text-brand-orange transition-colors"
+                  className="flex min-h-[48px] items-center justify-between rounded-lg border border-brand-dark-border bg-brand-dark-surface px-4 py-3 font-display text-lg font-black uppercase tracking-wider text-white hover:border-brand-orange hover:text-brand-orange transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="text-xs font-black text-brand-orange">
+                    <span className="font-mono text-xs font-bold text-brand-orange">
                       0{idx + 1}
                     </span>
                     <span>{link.label}</span>
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-neutral-400" aria-hidden="true" />
+                  <ArrowUpRight
+                    className="h-4 w-4 text-stone-400"
+                    aria-hidden="true"
+                  />
                 </a>
               ))}
 
               <div className="pt-3 mt-3 border-t border-brand-dark-border space-y-3">
-                <div className="rounded-lg bg-brand-dark-card border border-brand-dark-border p-3.5 text-xs text-neutral-300 space-y-1.5">
+                <div className="rounded-lg bg-brand-dark-surface border border-brand-dark-border p-3.5 text-xs text-stone-300 space-y-1.5">
                   <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" aria-hidden="true" />
+                    <MapPin
+                      className="h-4 w-4 text-brand-orange shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     <span>{unidade.endereco}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Clock className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" aria-hidden="true" />
+                    <Clock
+                      className="h-4 w-4 text-brand-orange shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     <div>
                       {horarios.map((h) => (
                         <p key={h.dias}>
-                          <strong className="text-white">{h.dias}:</strong> {h.horario}
+                          <strong className="text-white">{h.dias}:</strong>{' '}
+                          {h.horario}
                         </p>
                       ))}
                     </div>
@@ -210,7 +225,7 @@ export function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={closeMenu}
-                  className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-brand-orange px-5 py-3 text-sm font-black uppercase tracking-wider text-black hover:bg-brand-orange-hover transition-colors"
+                  className="btn-tactile flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-brand-orange px-5 py-3 font-display text-base font-black uppercase tracking-wider text-black hover:bg-brand-orange-hover"
                 >
                   <MessageCircle className="h-5 w-5" aria-hidden="true" />
                   <span>Chamar no WhatsApp</span>

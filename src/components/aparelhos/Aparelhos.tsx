@@ -6,178 +6,257 @@ import {
   HeartPulse,
   Flame,
   CheckCircle2,
-  Layers,
+  Crosshair,
+  Gauge,
 } from 'lucide-react';
 import { ACADEMIA_DATA } from '@/data/academia';
 import { isPlaceholderValue } from '@/lib/links';
 
-const COMPLEMENTOS_SUGERIDOS: Record<string, string[]> = {
-  'Musculação / Peso Livre': [
-    'Máquinas articuladas e guiadas para membros superiores e inferiores',
-    'Bancos reguláveis, gaiolas de agachamento e suporte olímpico',
-    'Jogos completos de halteres, anilhas e barras para treino de força',
-    'Estações de polia dupla (crossover) e puxadores de alta precisão',
-  ],
-  Cardio: [
-    'Esteiras ergométricas profissionais para corrida e caminhada',
-    'Bicicletas ergométricas e spinning para condicionamento aeróbico',
-    'Elípticos e simuladores de movimento contínuo de baixo impacto',
-    'Área ventilada ideal para aquecimento e queima calórica pós-treino',
-  ],
-  'Funcional / Coletivas': [
-    'Sala dedicada para Jump, Ritmos, Fit Dance, Step e Judô',
-    'Mini trampolins individuais para aulas intensas de Jump',
-    'Steps ajustáveis, colchonetes, cones, cordas e acessórios funcionais',
-    'Sistema de som e iluminação preparado para aulas coletivas energéticas',
-  ],
-};
-
-function getCategoryIcon(categoria: string) {
-  const lower = categoria.toLowerCase();
-  if (lower.includes('cardio')) {
-    return HeartPulse;
-  }
-  if (lower.includes('funcional') || lower.includes('coletiva')) {
-    return Flame;
-  }
-  return Dumbbell;
+interface ZonaConfig {
+  codigo: string;
+  tituloArena: string;
+  subtituloTecnico: string;
+  focoFisiologico: string;
+  intensidade: string;
+  icone: typeof Dumbbell;
+  equipamentosBase: string[];
 }
+
+const ZONAS_MAP: Record<string, ZonaConfig> = {
+  'Musculação / Peso Livre': {
+    codigo: 'ZONA 01',
+    tituloArena: 'ZONA 01 // FORÇA BRUTA & MUSCULAÇÃO',
+    subtituloTecnico: 'HIPERTROFIA · CARGA LIVRE · BIOMECÂNICA DE PRECISÃO',
+    focoFisiologico: 'Força Máxima & Densidade Muscular',
+    intensidade: 'ALTA CARGA',
+    icone: Dumbbell,
+    equipamentosBase: [
+      'Máquinas articuladas e guiadas para isolamento de grandes e pequenos grupamentos',
+      'Setor de peso livre com halteres pareados, barras olímpicas e anilhas calibradas',
+      'Gaiolas de agachamento, bancos reguláveis e estações de supino',
+      'Polias duplas (crossover), puxadores altos e remadas com pegadas anatômicas',
+    ],
+  },
+  Cardio: {
+    codigo: 'ZONA 02',
+    tituloArena: 'ZONA 02 // CARDIO & METABÓLICO',
+    subtituloTecnico: 'RESISTÊNCIA AERÓBICA · QUEIMA CALÓRICA · HIIT',
+    focoFisiologico: 'Condicionamento Cardiovascular & Definição',
+    intensidade: 'RITMO CONTÍNUO',
+    icone: HeartPulse,
+    equipamentosBase: [
+      'Esteiras profissionais de alto impacto para corrida intensa e caminhada inclinada',
+      'Bicicletas ergométricas e spinning para treinos intervalados de alta rotação',
+      'Elípticos sincronizados para trabalho aeróbico sem sobrecarga articular',
+      'Corredor de cardio ventilado com visão ampla da arena de treino',
+    ],
+  },
+  'Funcional / Coletivas': {
+    codigo: 'ZONA 03',
+    tituloArena: 'ZONA 03 // ARENA COLETIVA & FUNCIONAL',
+    subtituloTecnico: 'EXPLOSÃO · AGILIDADE · AULAS GUIADAS POR PROFESSORES',
+    focoFisiologico: 'Potência Atlética, Coordenação & Gasto Energético',
+    intensidade: 'EXPLOSIVO',
+    icone: Flame,
+    equipamentosBase: [
+      'Arena dedicada para Jump, Ritmos / Fit Dance, Funcional, Judô e Step',
+      'Mini trampolins reforçados para sessões de Jump de alta queima calórica',
+      'Steps modulares, tatame para artes marciais, cones, cordas e acessórios',
+      'Acústica e iluminação preparadas para puxar o ritmo do início ao fim',
+    ],
+  },
+};
 
 export function Aparelhos() {
   const { categoriasAparelhos } = ACADEMIA_DATA;
-  const [abaAtiva, setAbaAtiva] = useState<string>('Todas');
+  const [zonaSelecionada, setZonaSelecionada] = useState<string>('TODAS');
 
-  const abas = ['Todas', ...categoriasAparelhos.map((c) => c.categoria)];
+  const opcoesFiltro = [
+    { id: 'TODAS', label: 'VISÃO GERAL DA ARENA' },
+    ...categoriasAparelhos.map((cat, idx) => ({
+      id: cat.categoria,
+      label: `ZONA 0${idx + 1} · ${cat.categoria.split('/')[0].trim()}`,
+    })),
+  ];
 
   const categoriasVisiveis =
-    abaAtiva === 'Todas'
+    zonaSelecionada === 'TODAS'
       ? categoriasAparelhos
-      : categoriasAparelhos.filter((c) => c.categoria === abaAtiva);
+      : categoriasAparelhos.filter((c) => c.categoria === zonaSelecionada);
 
   return (
     <section
       id="aparelhos"
       aria-labelledby="aparelhos-heading"
-      className="py-16 sm:py-24 bg-[#0E0E0E] border-b border-brand-dark-border"
+      className="relative py-20 sm:py-28 bg-brand-dark border-b border-brand-dark-border overflow-hidden"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Cabeçalho + Abas */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 sm:mb-12">
+        {/* Cabeçalho de Arena */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 sm:mb-16">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-brand-orange">
-              <Layers className="h-4 w-4" aria-hidden="true" />
-              <span>Áreas de Treino</span>
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-brand-orange">
+              <Crosshair className="h-4 w-4" aria-hidden="true" />
+              <span>Mapeamento de Performance</span>
             </div>
             <h2
               id="aparelhos-heading"
-              className="text-[clamp(1.75rem,3.8vw,3rem)] font-black uppercase tracking-tight text-white leading-tight"
+              className="font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-black uppercase tracking-tight text-white leading-[0.95]"
             >
-              Aparelhos e <span className="text-brand-orange">Modalidades</span>{' '}
-              por Categoria
+              ZONAS DE <span className="text-brand-orange">TREINO</span> &
+              EQUIPAMENTOS
             </h2>
-            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
-              Navegue pelas áreas da academia para conferir os recursos
-              disponíveis para hipertrofia, emagrecimento e condicionamento.
+            <p className="text-base sm:text-lg text-stone-300 leading-relaxed max-w-[60ch]">
+              A Tropical Fit Água Quente é dividida em três setores de
+              performance para você treinar sem improviso.
             </p>
           </div>
 
-          {/* Abas Responsivas */}
+          {/* Seletor Tátil de Zonas */}
           <div
             role="tablist"
-            aria-label="Filtrar aparelhos por categoria"
+            aria-label="Selecionar zona de treino"
             className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
           >
-            {abas.map((aba) => {
-              const isSelected = abaAtiva === aba;
+            {opcoesFiltro.map((op) => {
+              const ativa = zonaSelecionada === op.id;
               return (
                 <button
-                  key={aba}
+                  key={op.id}
                   type="button"
                   role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => setAbaAtiva(aba)}
-                  className={`inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
-                    isSelected
-                      ? 'bg-brand-orange text-black shadow-md shadow-brand-orange/20'
-                      : 'border border-brand-dark-border bg-brand-dark-card text-neutral-300 hover:border-brand-orange/60 hover:text-white'
+                  aria-selected={ativa}
+                  onClick={() => setZonaSelecionada(op.id)}
+                  className={`btn-tactile inline-flex min-h-[46px] shrink-0 items-center justify-center rounded-xl px-4 py-2.5 font-display text-sm sm:text-base font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                    ativa
+                      ? 'bg-brand-orange text-black shadow-orange-glow-sm'
+                      : 'border border-brand-dark-border bg-brand-dark-surface text-stone-300 hover:border-brand-orange hover:text-white'
                   }`}
                 >
-                  {aba}
+                  {op.label}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Cards de Categorias de Aparelhos */}
-        <div
-          className={`grid grid-cols-1 gap-6 ${
-            categoriasVisiveis.length === 1
-              ? 'max-w-3xl'
-              : 'md:grid-cols-2 lg:grid-cols-3'
-          }`}
-        >
+        {/* Painéis de Arena (Quebra de monotonia: painéis horizontais de especificações com numeração gigante) */}
+        <div className="space-y-6">
           {categoriasVisiveis.map((cat, idx) => {
-            const Icon = getCategoryIcon(cat.categoria);
-            const hasOnlyPlaceholders = cat.itens.every((item) =>
-              isPlaceholderValue(item)
+            const numeroReal =
+              categoriasAparelhos.findIndex(
+                (item) => item.categoria === cat.categoria
+              ) + 1;
+            const numFormatado = `0${numeroReal > 0 ? numeroReal : idx + 1}`;
+
+            const config = ZONAS_MAP[cat.categoria] ?? {
+              codigo: `ZONA ${numFormatado}`,
+              tituloArena: `ZONA ${numFormatado} // ${cat.categoria.toUpperCase()}`,
+              subtituloTecnico: 'ESTRUTURA DE ALTA PERFORMANCE',
+              focoFisiologico: cat.descricao,
+              intensidade: 'ALTA PERFORMANCE',
+              icone: Dumbbell,
+              equipamentosBase: cat.itens,
+            };
+
+            const Icon = config.icone;
+            const usaPlaceholder = cat.itens.every((i) =>
+              isPlaceholderValue(i)
             );
-            const listaExibicao = hasOnlyPlaceholders
-              ? COMPLEMENTOS_SUGERIDOS[cat.categoria] ?? cat.itens
+            const listaItens = usaPlaceholder
+              ? config.equipamentosBase
               : cat.itens;
 
             return (
               <article
                 key={cat.categoria}
-                className="flex flex-col justify-between rounded-2xl border border-brand-dark-border bg-brand-dark-card p-6 sm:p-7 transition-colors hover:border-brand-orange/60"
+                className="group relative overflow-hidden rounded-2xl border-2 border-brand-dark-border bg-brand-dark-card transition-colors duration-200 hover:border-brand-orange/70"
               >
-                <div className="space-y-5">
-                  {/* Topo do Card */}
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange text-black shadow-md shadow-brand-orange/20">
-                      <Icon className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <span className="rounded-full border border-brand-dark-border bg-brand-dark px-3 py-1 text-xs font-black uppercase tracking-widest text-neutral-400">
-                      Área 0{idx + 1}
+                {/* Barra Técnica Superior do Painel */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-dark-border bg-brand-dark-surface px-5 py-3 sm:px-8">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center rounded bg-brand-orange px-2.5 py-0.5 font-display text-xs font-black uppercase tracking-widest text-black">
+                      {config.codigo}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-stone-400">
+                      {config.subtituloTecnico}
                     </span>
                   </div>
 
-                  {/* Título e Descrição */}
-                  <div className="space-y-2">
-                    <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
-                      {cat.categoria}
-                    </h3>
-                    <p className="text-sm text-neutral-300 leading-relaxed">
-                      {cat.descricao}
-                    </p>
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-yellow">
+                    <Gauge className="h-4 w-4" aria-hidden="true" />
+                    <span>INTENSIDADE: {config.intensidade}</span>
                   </div>
-
-                  {/* Lista Escaneável de Equipamentos */}
-                  <ul className="space-y-3 pt-2 border-t border-brand-dark-border">
-                    {listaExibicao.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2.5 text-sm text-neutral-200"
-                      >
-                        <CheckCircle2
-                          className="h-4 w-4 text-brand-orange shrink-0 mt-0.5"
-                          aria-hidden="true"
-                        />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
 
-                {/* Nota discreta quando ainda usa catálogo base */}
-                {hasOnlyPlaceholders ? (
-                  <div className="mt-6 pt-3 border-t border-brand-dark-border/60 flex items-center justify-between text-[11px] text-neutral-400">
-                    <span>Incluso em todos os planos</span>
-                    <span className="text-brand-orange font-bold uppercase">
-                      Acesso Livre
-                    </span>
+                {/* Corpo do Painel de Arena */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 p-6 sm:p-8 items-center">
+                  {/* Bloco Identificador da Zona (5 cols) */}
+                  <div className="lg:col-span-5 flex flex-col justify-between space-y-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <h3 className="font-display text-3xl sm:text-4xl font-black uppercase leading-[0.95] tracking-tight text-white">
+                          {config.tituloArena}
+                        </h3>
+                        <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
+                          {cat.descricao}
+                        </p>
+                      </div>
+
+                      {/* Numeração Display Gigante */}
+                      <span
+                        className="font-display text-6xl sm:text-7xl font-black leading-none tracking-tighter text-brand-orange/25 group-hover:text-brand-orange transition-colors select-none shrink-0 tabular-nums"
+                        aria-hidden="true"
+                      >
+                        {numFormatado}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-xl border border-brand-dark-border bg-brand-dark px-4 py-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-orange text-black">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                          Objetivo de Treino
+                        </span>
+                        <span className="text-xs sm:text-sm font-bold text-white">
+                          {config.focoFisiologico}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                ) : null}
+
+                  {/* Lista Técnica de Equipamentos em Grid 2 Colunas (7 cols) */}
+                  <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {listaItens.map((item, itemIdx) => (
+                      <div
+                        key={item}
+                        className="flex items-start gap-3 rounded-xl border border-brand-dark-border bg-brand-dark-surface p-4"
+                      >
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-brand-orange/15 font-display text-xs font-black text-brand-orange tabular-nums">
+                          0{itemIdx + 1}
+                        </div>
+                        <p className="text-xs sm:text-sm font-medium text-stone-200 leading-snug">
+                          {item}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rodapé do Painel */}
+                <div className="flex items-center justify-between border-t border-brand-dark-border/60 bg-brand-dark px-5 py-2.5 sm:px-8 text-[11px] font-semibold text-stone-400">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2
+                      className="h-3.5 w-3.5 text-brand-orange"
+                      aria-hidden="true"
+                    />
+                    Acesso liberado em todos os planos da Unidade Água Quente
+                  </span>
+                  <span className="uppercase tracking-widest text-stone-500">
+                    SETOR #{numFormatado}
+                  </span>
+                </div>
               </article>
             );
           })}

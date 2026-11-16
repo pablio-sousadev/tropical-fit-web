@@ -9,27 +9,32 @@ import {
   CalendarCheck,
   CreditCard,
   ExternalLink,
+  ScanLine,
+  ShieldCheck,
 } from 'lucide-react';
 import { ACADEMIA_DATA } from '@/data/academia';
 
 const RECURSOS_SCA = [
   {
     icone: Dumbbell,
-    titulo: 'Ficha de Treino Digital',
+    codigo: 'MOD // 01',
+    titulo: 'Treino Digital & Cargas',
     descricao:
-      'Visualize séries, repetições e evolução de cargas direto no celular.',
+      'Séries, repetições e progressão de cargas atualizadas pelo professor direto na tela.',
   },
   {
     icone: CalendarCheck,
-    titulo: 'Frequência e Horários',
+    codigo: 'MOD // 02',
+    titulo: 'Histórico de Presença',
     descricao:
-      'Acompanhe seus dias de presença, histórico de acessos e avisos da unidade.',
+      'Acompanhe sua frequência semanal, metas de constância e comunicados da unidade.',
   },
   {
     icone: CreditCard,
-    titulo: 'Matrícula e Mensalidades',
+    codigo: 'MOD // 03',
+    titulo: 'Gestão de Matrícula',
     descricao:
-      'Consulte vencimentos, status do plano e histórico de pagamentos sem fila.',
+      'Consulte vencimentos, renovação de ciclo e comprovantes sem precisar pegar fila.',
   },
 ] as const;
 
@@ -67,55 +72,55 @@ export function AppAluno() {
     <section
       id="app-aluno"
       aria-labelledby="app-aluno-heading"
-      className="py-16 sm:py-24 bg-brand-dark border-b border-brand-dark-border"
+      className="py-20 sm:py-28 bg-brand-dark scenic-spotlight border-b border-brand-dark-border"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border-2 border-brand-orange/40 bg-brand-dark-card p-6 sm:p-10 lg:p-12 shadow-2xl">
-          {/* Efeito radial laranja no canto */}
-          <div
-            className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-brand-orange/15 blur-3xl"
-            aria-hidden="true"
-          />
-
+        <div className="relative overflow-hidden rounded-3xl border-2 border-brand-dark-border bg-brand-dark-card p-6 sm:p-10 lg:p-12 shadow-2xl">
           <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Coluna Esquerda: Explicação e Recursos */}
+            {/* Coluna Esquerda: Identidade do App SCA Aluno (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange/40 bg-brand-orange/10 px-3.5 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange">
+              <div className="inline-flex items-center gap-2 rounded-md border border-brand-orange/40 bg-brand-dark-surface px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">
                 <Smartphone className="h-4 w-4" aria-hidden="true" />
-                <span>Exclusivo para Alunos</span>
+                <span>Ecossistema Digital do Aluno</span>
               </div>
 
               <div className="space-y-3">
                 <h2
                   id="app-aluno-heading"
-                  className="text-[clamp(1.85rem,4vw,3.25rem)] font-black uppercase tracking-tight text-white leading-tight"
+                  className="font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-black uppercase tracking-tight text-white leading-[0.93]"
                 >
-                  Baixe o App{' '}
-                  <span className="text-brand-orange">SCA Aluno</span>
+                  CREDENCIAL DIGITAL{' '}
+                  <span className="text-brand-orange">SCA ALUNO</span>
                 </h2>
-                <p className="text-sm sm:text-base text-neutral-300 leading-relaxed max-w-2xl">
-                  Acompanhe seu treino completo, matrícula, pagamentos, horários
-                  e frequência na palma da mão. Basta instalar o aplicativo e
-                  inserir o código oficial da {unidade.nome}.
+                <p className="text-base sm:text-lg text-stone-300 leading-relaxed max-w-2xl">
+                  Sua ficha de treino, controle de frequência e situação da
+                  matrícula sincronizados no celular. Instale o App SCA Aluno e
+                  autentique seu acesso com o código oficial da{' '}
+                  <strong className="text-white">{unidade.nome}</strong>.
                 </p>
               </div>
 
-              {/* Lista de Recursos */}
+              {/* Módulos do App */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 {RECURSOS_SCA.map((item) => {
                   const Icon = item.icone;
                   return (
                     <div
                       key={item.titulo}
-                      className="rounded-xl border border-brand-dark-border bg-brand-dark p-4 space-y-2"
+                      className="rounded-xl border border-brand-dark-border bg-brand-dark-surface p-4 space-y-2.5"
                     >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-orange/15 text-brand-orange">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-orange text-black">
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </div>
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                          {item.codigo}
+                        </span>
                       </div>
-                      <h3 className="text-sm font-black uppercase text-white">
+                      <h3 className="font-display text-lg font-black uppercase tracking-wide text-white">
                         {item.titulo}
                       </h3>
-                      <p className="text-xs text-neutral-400 leading-relaxed">
+                      <p className="text-xs text-stone-300 leading-relaxed">
                         {item.descricao}
                       </p>
                     </div>
@@ -123,19 +128,21 @@ export function AppAluno() {
                 })}
               </div>
 
-              {/* Links das Lojas (App Store e Google Play) */}
-              <div className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-3 pt-2">
+              {/* Badges de Download Táteis (App Store e Google Play) */}
+              <div className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-3.5 pt-2">
                 <a
                   href="https://apps.apple.com/br/search?term=SCA%20Aluno"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl border border-white/20 bg-black px-5 py-2.5 text-left text-white hover:border-brand-orange transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-3 rounded-xl border border-brand-dark-border bg-brand-dark-surface px-5 py-3 text-left text-white hover:border-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
                 >
                   <div className="leading-tight">
-                    <span className="block text-[10px] uppercase tracking-wider text-neutral-400">
-                      Disponível na
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                      Baixar para iOS
                     </span>
-                    <span className="text-sm font-black">App Store</span>
+                    <span className="font-display text-lg font-black uppercase tracking-wide">
+                      App Store
+                    </span>
                   </div>
                   <ExternalLink
                     className="h-4 w-4 text-brand-orange shrink-0"
@@ -147,13 +154,15 @@ export function AppAluno() {
                   href="https://play.google.com/store/search?q=SCA%20Aluno&c=apps"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl border border-white/20 bg-black px-5 py-2.5 text-left text-white hover:border-brand-orange transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-3 rounded-xl border border-brand-dark-border bg-brand-dark-surface px-5 py-3 text-left text-white hover:border-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
                 >
                   <div className="leading-tight">
-                    <span className="block text-[10px] uppercase tracking-wider text-neutral-400">
-                      Disponível no
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                      Baixar para Android
                     </span>
-                    <span className="text-sm font-black">Google Play</span>
+                    <span className="font-display text-lg font-black uppercase tracking-wide">
+                      Google Play
+                    </span>
                   </div>
                   <ExternalLink
                     className="h-4 w-4 text-brand-orange shrink-0"
@@ -163,53 +172,105 @@ export function AppAluno() {
               </div>
             </div>
 
-            {/* Coluna Direita: Card do Código da Academia com Cópia em 1 Clique */}
+            {/* Coluna Direita: Credencial Digital do Atleta com Moldura de Leitor de Acesso (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="rounded-2xl border-2 border-brand-orange bg-brand-dark p-6 sm:p-8 text-center space-y-5 shadow-xl">
-                <div className="space-y-1">
-                  <p className="text-xs font-black uppercase tracking-[0.22em] text-neutral-400">
-                    Código da Academia
-                  </p>
-                  <p className="text-xs text-neutral-400">
-                    Use este código no primeiro acesso ao App SCA Aluno
-                  </p>
-                </div>
-
-                {/* Display do Código */}
-                <div className="rounded-xl border border-brand-orange/40 bg-brand-orange/10 py-4 px-3">
-                  <span className="font-mono text-3xl sm:text-4xl font-black tracking-[0.18em] text-brand-orange select-all">
-                    {codigo}
+              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-orange bg-brand-dark p-6 sm:p-8 shadow-orange-glow">
+                {/* Header da Credencial */}
+                <div className="flex items-center justify-between gap-2 border-b border-brand-dark-border pb-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <ScanLine
+                      className="h-5 w-5 text-brand-orange"
+                      aria-hidden="true"
+                    />
+                    <span className="font-display text-base font-black uppercase tracking-wider text-white">
+                      CREDENCIAL DO ATLETA
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 rounded bg-brand-dark-surface px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-yellow border border-brand-dark-border">
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        copiado ? 'bg-emerald-400' : 'bg-brand-orange'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {copiado ? 'AUTENTICADO' : 'LEITOR ATIVO'}
                   </span>
                 </div>
 
-                {/* Botão Copiar Código */}
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  aria-live="polite"
-                  className={`flex min-h-[50px] w-full items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-black uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
-                    copiado
-                      ? 'bg-emerald-500 text-black'
-                      : 'bg-brand-orange text-black hover:bg-brand-orange-hover shadow-lg shadow-brand-orange/25'
-                  }`}
-                >
-                  {copiado ? (
-                    <>
-                      <Check className="h-5 w-5 shrink-0" aria-hidden="true" />
-                      <span>Copiado! ({codigo})</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-5 w-5 shrink-0" aria-hidden="true" />
-                      <span>Copiar Código</span>
-                    </>
-                  )}
-                </button>
+                {/* Moldura de Leitor de Acesso com Cantoneiras Ópticas */}
+                <div className="relative rounded-xl border border-brand-dark-border bg-brand-dark-surface p-6 text-center">
+                  {/* Cantoneiras do Leitor Óptico */}
+                  <span
+                    className="pointer-events-none absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t-2 border-l-2 border-brand-orange"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="pointer-events-none absolute top-2.5 right-2.5 h-3.5 w-3.5 border-t-2 border-r-2 border-brand-orange"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="pointer-events-none absolute bottom-2.5 left-2.5 h-3.5 w-3.5 border-b-2 border-l-2 border-brand-orange"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="pointer-events-none absolute bottom-2.5 right-2.5 h-3.5 w-3.5 border-b-2 border-r-2 border-brand-orange"
+                    aria-hidden="true"
+                  />
 
-                <p className="text-[11px] text-neutral-400">
-                  Dúvidas no primeiro acesso? A recepção da {unidade.unidade}{' '}
-                  ajuda você a configurar em segundos.
-                </p>
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400">
+                    CÓDIGO OFICIAL DA UNIDADE
+                  </p>
+
+                  <div className="my-3">
+                    <span className="font-display text-4xl sm:text-5xl font-black tracking-[0.16em] text-brand-orange select-all tabular-nums">
+                      {codigo}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] font-medium text-stone-400">
+                    {unidade.nome} · {unidade.unidade}
+                  </p>
+                </div>
+
+                {/* Botão de Cópia Tátil */}
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    aria-live="polite"
+                    className={`btn-tactile flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-display text-lg font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                      copiado
+                        ? 'bg-emerald-500 text-black'
+                        : 'bg-brand-orange text-black shadow-tactile hover:bg-brand-orange-hover'
+                    }`}
+                  >
+                    {copiado ? (
+                      <>
+                        <Check className="h-5 w-5 shrink-0 stroke-[2.5]" aria-hidden="true" />
+                        <span>Copiado! ({codigo})</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-5 w-5 shrink-0 stroke-[2.25]" aria-hidden="true" />
+                        <span>Copiar Código</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Rodapé de Autenticação da Credencial */}
+                <div className="mt-5 flex items-center justify-between border-t border-brand-dark-border pt-4 text-[11px] text-stone-400">
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck
+                      className="h-4 w-4 text-brand-orange"
+                      aria-hidden="true"
+                    />
+                    Ativação gratuita na recepção
+                  </span>
+                  <span className="font-mono uppercase text-stone-500">
+                    ID #{codigo}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
