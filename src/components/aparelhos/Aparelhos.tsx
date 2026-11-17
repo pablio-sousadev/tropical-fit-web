@@ -98,6 +98,7 @@ export function Aparelhos() {
     trackPointerHandlers,
   } = useCarouselTrack({
     itemCount: categoriasAparelhos.length,
+    autoplayMs: 4500,
     onSlideLabel: getZonaLabel,
   });
 
@@ -224,7 +225,7 @@ export function Aparelhos() {
                       scrollToIndex(idx);
                     }
                   }}
-                  className={`w-[86vw] sm:w-[82vw] lg:w-[82%] max-w-[920px] shrink-0 snap-center transition-all duration-300 ${
+                  className={`w-[86vw] sm:w-[82vw] lg:w-[82%] max-w-[920px] shrink-0 snap-center first:snap-start last:snap-end transition-all duration-300 ${
                     isCurrent
                       ? 'scale-100 opacity-100'
                       : 'scale-[0.97] opacity-80 hover:opacity-100 cursor-pointer'

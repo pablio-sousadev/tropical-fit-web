@@ -51,6 +51,7 @@ export function Galeria() {
     trackPointerHandlers,
   } = useCarouselTrack({
     itemCount: fotosFiltradas.length,
+    autoplayMs: 3800,
     isPausedByModal: selectedIndex !== null,
     onSlideLabel: getSlideLabel,
   });
@@ -147,7 +148,7 @@ export function Galeria() {
                   role="group"
                   aria-roledescription="slide"
                   aria-label={`${index + 1} de ${fotosFiltradas.length}`}
-                  className="w-[78vw] sm:w-[48%] lg:w-[38%] xl:w-[35%] max-w-[440px] shrink-0 snap-center"
+                  className="w-[78vw] sm:w-[48%] lg:w-[38%] xl:w-[35%] max-w-[440px] shrink-0 snap-center first:snap-start last:snap-end"
                 >
                   <SpotlightCard
                     as="button"

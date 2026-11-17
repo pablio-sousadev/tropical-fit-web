@@ -60,29 +60,58 @@ export function useCarouselTrack({
     samples: [],
   });
 
+  const getTargetScrollLeft = useCallback(
+    (index: number): number => {
+      const container = trackRef.current;
+      const card = itemRefs.current[index];
+      if (!container || !card || itemCount === 0) return 0;
+
+      const maxScroll = Math.max(
+        0,
+        container.scrollWidth - container.clientWidth
+      );
+      if (index <= 0) return 0;
+      if (index >= itemCount - 1) return maxScroll;
+
+      const centeredLeft =
+        card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
+      return Math.max(0, Math.min(maxScroll, centeredLeft));
+    },
+    [itemCount]
+  );
+
   const computeClosestIndex = useCallback((): number => {
     const container = trackRef.current;
     if (!container || itemCount === 0) return 0;
 
-    const center = container.scrollLeft + container.clientWidth / 2;
+    const maxScroll = Math.max(
+      0,
+      container.scrollWidth - container.clientWidth
+    );
+    const currentLeft = container.scrollLeft;
+
+    if (maxScroll <= 4 || currentLeft <= 4) return 0;
+    if (currentLeft >= maxScroll - 4) return itemCount - 1;
+
     let closest = 0;
     let minDistance = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < itemCount; i += 1) {
-      const card = itemRefs.current[i];
-      if (!card) continue;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      const dist = Math.abs(center - cardCenter);
+      const target = getTargetScrollLeft(i);
+      const dist = Math.abs(currentLeft - target);
       if (dist < minDistance) {
         minDistance = dist;
         closest = i;
       }
     }
     return closest;
-  }, [itemCount]);
+  }, [getTargetScrollLeft, itemCount]);
 
   const scrollToIndex = useCallback(
-    (index: number, behavior?: ScrollBehavior) => {
+    (
+      index: number,
+      options?: { behavior?: ScrollBehavior; announce?: boolean }
+    ) => {
       const container = trackRef.current;
       const card = itemRefs.current[index];
       if (!container || !card || itemCount === 0) return;
@@ -92,22 +121,23 @@ export function useCarouselTrack({
         typeof window !== 'undefined' &&
         window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const resolvedBehavior: ScrollBehavior =
-        behavior ?? (prefersReduced ? 'auto' : 'smooth');
+        options?.behavior ?? (prefersReduced ? 'auto' : 'smooth');
 
-      hasInteractedRef.current = true;
+      if (options?.announce !== false) {
+        hasInteractedRef.current = true;
+      }
       pendingTargetRef.current = clamped;
       setActiveIndex(clamped);
 
-      const targetLeft =
-        card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
+      const targetLeft = getTargetScrollLeft(clamped);
       container.scrollTo({
-        left: Math.max(0, targetLeft),
+        left: targetLeft,
         behavior: resolvedBehavior,
       });
 
       if (resolvedBehavior === 'auto') {
         pendingTargetRef.current = null;
-        if (lastSettledRef.current !== clamped) {
+        if (options?.announce !== false && lastSettledRef.current !== clamped) {
           lastSettledRef.current = clamped;
           setAnnouncement(
             onSlideLabel
@@ -117,7 +147,7 @@ export function useCarouselTrack({
         }
       }
     },
-    [itemCount, onSlideLabel]
+    [getTargetScrollLeft, itemCount, onSlideLabel]
   );
 
   const handlePrev = useCallback(() => {
@@ -283,7 +313,7 @@ export function useCarouselTrack({
         return;
       }
       const next = (activeIndex + 1) % itemCount;
-      scrollToIndex(next);
+      scrollToIndex(next, { announce: false });
     }, autoplayMs);
 
     return () => window.clearInterval(timer);
