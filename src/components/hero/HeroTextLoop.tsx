@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Pause, Play, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import {
   RotatingText,
   type RotatingTextRef,
@@ -16,13 +16,12 @@ const HERO_LOOP_PHRASES = [
 
 /**
  * Faixa cinética do Hero baseada no RotatingText (React Bits), com mola de largura,
- * controle acessível de Pausar/Retomar (WCAG 2.2.2) e pausa automática fora da viewport.
+ * pausa ao passar o mouse e pausa automática fora da viewport.
  */
 export function HeroTextLoop() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rotatingRef = useRef<RotatingTextRef | null>(null);
 
-  const [userPaused, setUserPaused] = useState(false);
   const [inView, setInView] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -43,14 +42,12 @@ export function HeroTextLoop() {
     return () => observer.disconnect();
   }, []);
 
-  const isAutoPlaying = !userPaused && inView;
-
   return (
     <div
       ref={containerRef}
       className="flex flex-wrap items-center gap-2.5 sm:gap-3"
     >
-      <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-white/10 bg-brand-dark-surface/90 p-1.5 pr-2.5 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-white/10 bg-brand-dark-surface/90 p-1.5 pr-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <span
           className="hidden sm:inline-flex items-center gap-1.5 pl-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-stone-300"
           aria-hidden="true"
@@ -73,7 +70,7 @@ export function HeroTextLoop() {
             splitBy="words"
             staggerDuration={0.045}
             rotationInterval={2800}
-            auto={isAutoPlaying}
+            auto={inView}
             pauseOnHover
             highlight
             highlightColor="#FF6B00"
@@ -99,23 +96,6 @@ export function HeroTextLoop() {
           ))}
         </span>
       </div>
-
-      {/* Controle acessível de Pausar/Retomar (WCAG 2.2.2 Pause, Stop, Hide; sem aria-pressed) */}
-      <button
-        type="button"
-        onClick={() => setUserPaused((prev) => !prev)}
-        aria-label={
-          userPaused ? 'Retomar rotação de frases' : 'Pausar rotação de frases'
-        }
-        title={userPaused ? 'Retomar' : 'Pausar'}
-        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-brand-dark-surface/90 text-stone-300 hover:border-brand-orange/60 hover:text-brand-orange transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
-      >
-        {userPaused ? (
-          <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
-        ) : (
-          <Pause className="h-3.5 w-3.5" aria-hidden="true" />
-        )}
-      </button>
     </div>
   );
 }

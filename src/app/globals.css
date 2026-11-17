@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -337,6 +349,69 @@
     .hero-enter-stagger {
       animation: aulas-row-in-forward var(--duration-very-slow) var(--ease-smooth-out) both;
       animation-delay: calc(var(--enter-index, 0) * var(--duration-stagger));
+    }
+  }
+
+  /* Carrossel horizontal com drag fluido + hints de scroll (scroll-driven + fallback) */
+  .arena-carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    touch-action: pan-y manipulation;
+    --fade-size: 2rem;
+    scroll-padding-inline: var(--fade-size);
+    --fade-dir: right;
+    --fade-start-pos: 0;
+    --fade-end-pos: 100%;
+    mask:
+      linear-gradient(black, black) no-clip subtract,
+      linear-gradient(to var(--fade-dir), black, transparent) var(--fade-start-pos) 0 / var(--fade-start) 100% no-repeat no-clip,
+      linear-gradient(to var(--fade-dir), transparent, black) var(--fade-end-pos) 0 / var(--fade-end) 100% no-repeat no-clip;
+    animation: arena-reveal-fade-start linear both, arena-hide-fade-end linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: 0 var(--fade-size), calc(100% - var(--fade-size)) 100%;
+  }
+
+  @media (min-width: 640px) {
+    .arena-carousel-track {
+      --fade-size: 2.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arena-carousel-track {
+      scroll-behavior: smooth;
+    }
+  }
+
+  .arena-carousel-track[data-dragging='true'] {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+    cursor: grabbing;
+  }
+
+  @keyframes arena-reveal-fade-start {
+    to {
+      --fade-start: var(--fade-size);
+    }
+  }
+
+  @keyframes arena-hide-fade-end {
+    from {
+      --fade-end: var(--fade-size);
+    }
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    .arena-carousel-track {
+      transition: --fade-start 0.2s, --fade-end 0.2s;
+    }
+    .arena-carousel-track.more-start {
+      --fade-start: var(--fade-size);
+    }
+    .arena-carousel-track.more-end {
+      --fade-end: var(--fade-size);
     }
   }
 
