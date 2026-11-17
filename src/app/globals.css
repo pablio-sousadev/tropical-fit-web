@@ -45,6 +45,16 @@
     --learn-in: var(--duration-medium);
     --learn-out: var(--duration-medium);
     --learn-ease: var(--ease-smooth-out);
+
+    /* Card hover tilt (transitions.dev #19) */
+    --tilt-perspective: 1000px;
+    --tilt-return: 900ms;
+    --tilt-return-ease: var(--ease-smooth-out);
+    --tilt-follow: 360ms;
+    --tilt-follow-ease: var(--ease-smooth-out);
+    --tilt-glare-opacity: 0.24;
+    --tilt-glare-fade: 300ms;
+    --tilt-glare-ease: var(--ease-smooth-out);
   }
 
   html {
@@ -412,6 +422,60 @@
     }
     .arena-carousel-track.more-end {
       --fade-end: var(--fade-size);
+    }
+  }
+
+  /* Card hover tilt 3D + glare (transitions.dev #19) */
+  .t-tilt-card {
+    position: relative;
+    transform:
+      perspective(var(--tilt-perspective))
+      rotateX(var(--tilt-rx, 0deg))
+      rotateY(var(--tilt-ry, 0deg));
+    transform-style: preserve-3d;
+    transition: transform var(--tilt-return) var(--tilt-return-ease);
+    will-change: transform;
+  }
+
+  .t-tilt-card.is-tilting {
+    transition: transform var(--tilt-follow) var(--tilt-follow-ease);
+  }
+
+  .t-tilt-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: screen;
+    background:
+      radial-gradient(
+        circle 110px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+        rgba(255, 190, 120, 0.34),
+        rgba(255, 107, 0, 0.08) 52%,
+        rgba(255, 107, 0, 0) 84%
+      ),
+      radial-gradient(
+        circle 240px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+        rgba(255, 255, 255, 0.16),
+        rgba(255, 255, 255, 0.03) 58%,
+        rgba(255, 255, 255, 0) 78%
+      );
+    transition: opacity var(--tilt-glare-fade) var(--tilt-glare-ease);
+    z-index: 3;
+  }
+
+  .t-tilt.is-hover .t-tilt-glare {
+    opacity: var(--tilt-glare-opacity);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-tilt-card {
+      transform: none !important;
+      transition: none !important;
+    }
+    .t-tilt-glare {
+      display: none;
     }
   }
 
