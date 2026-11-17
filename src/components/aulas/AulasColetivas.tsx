@@ -105,6 +105,7 @@ export function AulasColetivas() {
   const { aulas, professores, unidade } = ACADEMIA_DATA;
 
   const [diaAtivo, setDiaAtivo] = useState<DiaGrade>('Segunda');
+  const [exitingDia, setExitingDia] = useState<DiaGrade | null>(null);
   const [direction, setDirection] = useState<NavDirection>('forward');
   const [transitionKey, setTransitionKey] = useState<number>(0);
   const [hojeDia, setHojeDia] = useState<DiaGrade | null>(null);
@@ -115,11 +116,15 @@ export function AulasColetivas() {
     {}
   );
   const scoreboardContainerRef = useRef<HTMLDivElement | null>(null);
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeIdx = Math.max(
     0,
     DIAS_SEMANA.findIndex((d) => d.id === diaAtivo)
   );
+  const infoDiaAtivo =
+    DIAS_SEMANA.find((d) => d.id === diaAtivo) ?? DIAS_SEMANA[0];
+  const aulasDiaAtivo = aulas.filter((aula) => aula.diaSemana === diaAtivo);
 
   // Detecta o dia atual apenas no cliente para evitar mismatch de hidratação
   useEffect(() => {
@@ -134,12 +139,38 @@ export function AulasColetivas() {
     setHojeDia(hoje);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+    };
+  }, []);
+
   const selectDia = useCallback(
     (nextDia: DiaGrade, options?: { keepCoachHighlight?: boolean }) => {
       if (nextDia === diaAtivo) return;
       const prevIdx = DIAS_SEMANA.findIndex((d) => d.id === diaAtivo);
       const nextIdx = DIAS_SEMANA.findIndex((d) => d.id === nextDia);
       setDirection(nextIdx >= prevIdx ? 'forward' : 'backward');
+
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+      if (exitTimerRef.current) {
+        clearTimeout(exitTimerRef.current);
+        exitTimerRef.current = null;
+      }
+
+      if (!prefersReducedMotion) {
+        setExitingDia(diaAtivo);
+        exitTimerRef.current = setTimeout(() => {
+          setExitingDia(null);
+          exitTimerRef.current = null;
+        }, 230);
+      } else {
+        setExitingDia(null);
+      }
+
       setDiaAtivo(nextDia);
       setTransitionKey((k) => k + 1);
       if (!options?.keepCoachHighlight) {
@@ -157,7 +188,7 @@ export function AulasColetivas() {
       const panel = panelRefs.current[dia.id];
       if (!panel) continue;
 
-      if (dia.id === diaAtivo) {
+      if (dia.id === diaAtivo || dia.id === exitingDia) {
         panel.removeAttribute('hidden');
       } else {
         panel.setAttribute('hidden', 'until-found');
@@ -176,7 +207,7 @@ export function AulasColetivas() {
     return () => {
       for (const cleanup of cleanups) cleanup();
     };
-  }, [diaAtivo, selectDia]);
+  }, [diaAtivo, exitingDia, selectDia]);
 
   // Navegação por teclado seguindo o padrão WAI-ARIA (selection follows focus)
   const handleTabKeyDown = (
@@ -342,248 +373,287 @@ export function AulasColetivas() {
           </div>
         </div>
 
-        {/* Painéis do Scoreboard (todos na mesma célula de grid para compatibilidade com hidden="until-found") */}
-        <div
-          ref={scoreboardContainerRef}
-          className="grid grid-cols-1 mb-12"
-        >
-          {DIAS_SEMANA.map((dia) => {
-            const isSelected = diaAtivo === dia.id;
-            const aulasDoDia = aulas.filter(
-              (aula) => aula.diaSemana === dia.id
-            );
-
-            return (
+        {/* Scoreboard Persistente com React Bits SpotlightCard + Transição Direcional e Cascata */}
+        <div ref={scoreboardContainerRef} className="mb-12">
+          <SpotlightCard
+            spotlightColor="#FF6B00"
+            intensity={0.14}
+            spotlightSize={380}
+            softness={0.75}
+            borderGlow={0.75}
+            proximity={90}
+            smoothing={0.28}
+            grain={0.04}
+            surfaceColor="#141210"
+            borderColor="rgba(255, 255, 255, 0.1)"
+            className="rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_25px_50px_-12px_rgba(0,0,0,0.7)]"
+          >
+            {/* Barra de Status do Placar persistente com Text Swap */}
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-brand-dark-surface/90 px-5 py-3.5 sm:px-8 backdrop-blur-sm">
               <div
-                key={dia.id}
-                ref={(el) => {
-                  panelRefs.current[dia.id] = el;
-                }}
-                id={`painel-aulas-${dia.id}`}
-                role="tabpanel"
-                aria-labelledby={`tab-aulas-${dia.id}`}
-                tabIndex={isSelected ? 0 : undefined}
-                hidden={!isSelected}
-                className={`col-start-1 row-start-1 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
-                  isSelected
-                    ? 'relative z-10 pointer-events-auto'
-                    : 'z-0 pointer-events-none'
+                key={`header-${diaAtivo}-${transitionKey}`}
+                className={`flex items-center gap-3 ${
+                  transitionKey > 0 ? 'aulas-header-swap' : ''
                 }`}
               >
-                {/* Wrapper visual interno com React Bits SpotlightCard + entrada direcional com cross-blur */}
-                <SpotlightCard
-                  key={`${dia.id}-${isSelected ? transitionKey : 'idle'}`}
-                  spotlightColor="#FF6B00"
-                  intensity={0.14}
-                  spotlightSize={380}
-                  softness={0.75}
-                  borderGlow={0.75}
-                  proximity={90}
-                  smoothing={0.28}
-                  grain={0.04}
-                  surfaceColor="#141210"
-                  borderColor="rgba(255, 255, 255, 0.1)"
-                  className={`rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_25px_50px_-12px_rgba(0,0,0,0.7)] ${
-                    isSelected
-                      ? direction === 'forward'
-                        ? 'aulas-panel-forward'
-                        : 'aulas-panel-backward'
-                      : ''
+                <span
+                  className="h-2.5 w-2.5 rounded-full bg-brand-orange shadow-[0_0_10px_rgba(255,107,0,0.85)]"
+                  aria-hidden="true"
+                />
+                <h3 className="font-display text-lg sm:text-2xl font-black uppercase tracking-wider text-white">
+                  PLACAR DE {infoDiaAtivo.completo.toUpperCase()}
+                </h3>
+                {hojeDia === infoDiaAtivo.id && (
+                  <span className="rounded-full bg-brand-orange/15 border border-brand-orange/40 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-orange">
+                    HOJE
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span
+                  key={`count-${diaAtivo}-${transitionKey}`}
+                  className={`rounded-lg bg-brand-dark/90 px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-brand-orange border border-white/10 tabular-nums ${
+                    transitionKey > 0 ? 'aulas-header-swap' : ''
                   }`}
                 >
-                  {/* Barra de Status do Placar */}
-                  <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-brand-dark-surface/90 px-5 py-3.5 sm:px-8 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="h-2.5 w-2.5 rounded-full bg-brand-orange shadow-[0_0_10px_rgba(255,107,0,0.85)]"
-                        aria-hidden="true"
-                      />
-                      <h3 className="font-display text-lg sm:text-2xl font-black uppercase tracking-wider text-white">
-                        PLACAR DE {dia.completo.toUpperCase()}
-                      </h3>
-                      {hojeDia === dia.id && (
-                        <span className="rounded-full bg-brand-orange/15 border border-brand-orange/40 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-orange">
-                          HOJE
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-lg bg-brand-dark/90 px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-brand-orange border border-white/10 tabular-nums">
-                        {aulasDoDia.length}{' '}
-                        {aulasDoDia.length === 1
-                          ? 'SESSÃO ATIVA'
-                          : 'SESSÕES ATIVAS'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Linhas do Scoreboard */}
-                  <div className="relative z-10 divide-y divide-white/[0.06]">
-                    {aulasDoDia.map((aula, idx) => {
-                      const meta = getModalidadeMeta(aula.modalidade);
-                      const turno = getTurnoLabel(aula.horario);
-                      const isCoachMatched =
-                        coachHighlight !== null &&
-                        aula.professor === coachHighlight;
-
-                      const aulaWhatsAppUrl = getWhatsAppUrl(
-                        unidade.whatsapp,
-                        `Olá! Quero saber mais sobre a aula de ${aula.modalidade} (${dia.completo}, às ${aula.horario}h) na Tropical Fit - Unidade Água Quente.`
-                      );
-
-                      return (
-                        <article
-                          key={aula.id}
-                          style={{ '--row-index': idx } as CSSProperties}
-                          className={`group grid grid-cols-1 md:grid-cols-12 items-center gap-4 sm:gap-6 p-5 sm:p-7 transition-colors hover:bg-white/[0.025] ${
-                            isSelected ? 'aulas-row-stagger' : ''
-                          } ${
-                            isCoachMatched
-                              ? 'bg-brand-orange/[0.07] ring-1 ring-inset ring-brand-orange/40'
-                              : ''
-                          }`}
-                        >
-                          {/* Horário Digital de Arena + Miniatura da Modalidade (4 cols) */}
-                          <div className="md:col-span-4 flex items-center gap-3.5">
-                            <span className="font-mono text-xs font-bold text-stone-500 tabular-nums">
-                              0{idx + 1}
-                            </span>
-                            <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">
-                              <img
-                                src={meta.foto}
-                                alt={aula.modalidade}
-                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                              />
-                              <div
-                                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="flex flex-col items-start gap-1">
-                              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-brand-orange bg-gradient-to-b from-brand-orange to-[#E85D04] px-3 py-1.5 sm:px-3.5 sm:py-2 text-black shadow-orange-glow-sm">
-                                <Clock
-                                  className="h-4 w-4 shrink-0 stroke-[2.5]"
-                                  aria-hidden="true"
-                                />
-                                <span className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight leading-none tabular-nums">
-                                  {aula.horario}H
-                                </span>
-                              </div>
-                              <span className="pl-1 text-[10px] font-bold uppercase tracking-widest text-stone-400">
-                                Turno {turno}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Modalidade, Badge Esportiva e Barra Cinética de Intensidade (5 cols) */}
-                          <div className="md:col-span-5 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2.5">
-                              <span className="rounded-md bg-brand-orange/15 border border-brand-orange/30 px-2.5 py-0.5 font-display text-xs font-black uppercase tracking-widest text-brand-orange">
-                                {meta.tag}
-                              </span>
-
-                              {/* Indicador visual de intensidade (4 barras) */}
-                              <div
-                                className="inline-flex items-center gap-1.5"
-                                aria-label={`Intensidade: ${meta.intensidade} (${meta.nivel} de 4)`}
-                              >
-                                <span className="inline-flex items-end gap-0.5 h-3">
-                                  {[1, 2, 3, 4].map((bar) => (
-                                    <span
-                                      key={bar}
-                                      className={`w-1 rounded-full transition-colors ${
-                                        bar <= meta.nivel
-                                          ? 'bg-brand-orange'
-                                          : 'bg-stone-700'
-                                      }`}
-                                      style={{ height: `${bar * 3}px` }}
-                                      aria-hidden="true"
-                                    />
-                                  ))}
-                                </span>
-                                <span className="text-[11px] font-bold uppercase tracking-widest text-stone-400">
-                                  {meta.intensidade}
-                                </span>
-                              </div>
-                            </div>
-
-                            <h4 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-tight text-white leading-none group-hover:text-brand-orange transition-colors">
-                              {aula.modalidade}
-                            </h4>
-                          </div>
-
-                          {/* Professor + Micro-CTA para WhatsApp (3 cols) */}
-                          <div className="md:col-span-3 flex flex-wrap md:flex-col items-center md:items-end justify-between gap-2.5">
-                            {aula.professor ? (
-                              <div className="inline-flex items-center gap-2.5 rounded-xl border border-brand-yellow/35 bg-brand-dark/90 px-3.5 py-2">
-                                <UserCheck
-                                  className="h-4 w-4 text-brand-yellow shrink-0"
-                                  aria-hidden="true"
-                                />
-                                <div>
-                                  <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
-                                    Comando da Aula
-                                  </span>
-                                  <span className="font-display text-lg font-black uppercase tracking-wide text-brand-yellow leading-tight">
-                                    {aula.professor}
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-brand-dark/90 px-3.5 py-2">
-                                <Flame
-                                  className="h-4 w-4 text-brand-orange shrink-0"
-                                  aria-hidden="true"
-                                />
-                                <div>
-                                  <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
-                                    Comando da Aula
-                                  </span>
-                                  <span className="font-display text-base font-black uppercase tracking-wide text-stone-200 leading-tight">
-                                    Instrutor Oficial
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-
-                            <a
-                              href={aulaWhatsAppUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="t-learn inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-300 hover:border-brand-orange/60 hover:bg-brand-orange/15 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
-                            >
-                              <span>Quero essa aula</span>
-                              <span className="t-learn-chevron" aria-hidden="true">
-                                <svg
-                                  viewBox="0 0 16 16"
-                                  className="h-3.5 w-3.5 text-brand-orange"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path
-                                    className="t-learn-arm t-learn-arm-top"
-                                    d="M6 4L10 8"
-                                  />
-                                  <path
-                                    className="t-learn-arm t-learn-arm-bot"
-                                    d="M10 8L6 12"
-                                  />
-                                </svg>
-                              </span>
-                            </a>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </SpotlightCard>
+                  {aulasDiaAtivo.length}{' '}
+                  {aulasDiaAtivo.length === 1
+                    ? 'SESSÃO ATIVA'
+                    : 'SESSÕES ATIVAS'}
+                </span>
               </div>
-            );
-          })}
+            </div>
+
+            {/* Viewport de painéis sobrepostos na mesma célula de grid (compatível com hidden="until-found") */}
+            <div className="relative z-10 grid grid-cols-1 overflow-hidden">
+              {DIAS_SEMANA.map((dia) => {
+                const isSelected = diaAtivo === dia.id;
+                const isExiting = exitingDia === dia.id;
+                const isVisible = isSelected || isExiting;
+                const aulasDoDia = aulas.filter(
+                  (aula) => aula.diaSemana === dia.id
+                );
+
+                const panelAnimClass =
+                  transitionKey === 0
+                    ? ''
+                    : isSelected
+                      ? direction === 'forward'
+                        ? 'aulas-panel-enter-forward'
+                        : 'aulas-panel-enter-backward'
+                      : isExiting
+                        ? direction === 'forward'
+                          ? 'aulas-panel-exit-forward'
+                          : 'aulas-panel-exit-backward'
+                        : '';
+
+                return (
+                  <div
+                    key={dia.id}
+                    ref={(el) => {
+                      panelRefs.current[dia.id] = el;
+                    }}
+                    id={`painel-aulas-${dia.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`tab-aulas-${dia.id}`}
+                    aria-hidden={isExiting ? true : undefined}
+                    tabIndex={isSelected ? 0 : undefined}
+                    hidden={!isVisible}
+                    className={`col-start-1 row-start-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange ${
+                      isSelected
+                        ? 'relative z-10 pointer-events-auto'
+                        : 'z-0 pointer-events-none'
+                    }`}
+                  >
+                    <div
+                      key={`${dia.id}-${isSelected ? transitionKey : isExiting ? `exit-${transitionKey}` : 'idle'}`}
+                      className={`divide-y divide-white/[0.06] ${panelAnimClass}`}
+                    >
+                      {aulasDoDia.map((aula, idx) => {
+                        const meta = getModalidadeMeta(aula.modalidade);
+                        const turno = getTurnoLabel(aula.horario);
+                        const isCoachMatched =
+                          coachHighlight !== null &&
+                          aula.professor === coachHighlight;
+
+                        const aulaWhatsAppUrl = getWhatsAppUrl(
+                          unidade.whatsapp,
+                          `Olá! Quero saber mais sobre a aula de ${aula.modalidade} (${dia.completo}, às ${aula.horario}h) na Tropical Fit - Unidade Água Quente.`
+                        );
+
+                        const rowStaggerClass =
+                          isSelected && transitionKey > 0
+                            ? direction === 'forward'
+                              ? 'aulas-row-stagger-forward'
+                              : 'aulas-row-stagger-backward'
+                            : '';
+
+                        return (
+                          <article
+                            key={aula.id}
+                            style={{ '--row-index': idx } as CSSProperties}
+                            className={`group grid grid-cols-1 md:grid-cols-12 items-center gap-4 sm:gap-6 p-5 sm:p-7 transition-colors hover:bg-white/[0.025] ${rowStaggerClass} ${
+                              isCoachMatched
+                                ? 'bg-brand-orange/[0.07] ring-1 ring-inset ring-brand-orange/40'
+                                : ''
+                            }`}
+                          >
+                            {/* Horário Digital de Arena + Miniatura da Modalidade (4 cols) */}
+                            <div className="md:col-span-4 flex items-center gap-3.5">
+                              <span className="font-mono text-xs font-bold text-stone-500 tabular-nums">
+                                0{idx + 1}
+                              </span>
+                              <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">
+                                <img
+                                  src={meta.foto}
+                                  alt={aula.modalidade}
+                                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                />
+                                <div
+                                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <div className="flex flex-col items-start gap-1">
+                                <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-brand-orange bg-gradient-to-b from-brand-orange to-[#E85D04] px-3 py-1.5 sm:px-3.5 sm:py-2 text-black shadow-orange-glow-sm">
+                                  <Clock
+                                    className="h-4 w-4 shrink-0 stroke-[2.5]"
+                                    aria-hidden="true"
+                                  />
+                                  <span className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight leading-none tabular-nums">
+                                    {aula.horario}H
+                                  </span>
+                                </div>
+                                <span className="pl-1 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                                  Turno {turno}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Modalidade, Badge Esportiva e Barra Cinética de Intensidade (5 cols) */}
+                            <div className="md:col-span-5 space-y-2">
+                              <div className="flex flex-wrap items-center gap-2.5">
+                                <span className="rounded-md bg-brand-orange/15 border border-brand-orange/30 px-2.5 py-0.5 font-display text-xs font-black uppercase tracking-widest text-brand-orange">
+                                  {meta.tag}
+                                </span>
+
+                                {/* Indicador visual cinético de intensidade (4 barras) */}
+                                <div
+                                  className="inline-flex items-center gap-1.5"
+                                  aria-label={`Intensidade: ${meta.intensidade} (${meta.nivel} de 4)`}
+                                >
+                                  <span className="inline-flex items-end gap-0.5 h-3">
+                                    {[1, 2, 3, 4].map((bar, barIdx) => (
+                                      <span
+                                        key={bar}
+                                        style={
+                                          {
+                                            height: `${bar * 3}px`,
+                                            '--bar-index': barIdx,
+                                          } as CSSProperties
+                                        }
+                                        className={`w-1 rounded-full transition-colors ${
+                                          bar <= meta.nivel
+                                            ? 'bg-brand-orange'
+                                            : 'bg-stone-700'
+                                        } ${
+                                          isSelected &&
+                                          transitionKey > 0 &&
+                                          bar <= meta.nivel
+                                            ? 'aulas-bar-rise'
+                                            : ''
+                                        }`}
+                                        aria-hidden="true"
+                                      />
+                                    ))}
+                                  </span>
+                                  <span className="text-[11px] font-bold uppercase tracking-widest text-stone-400">
+                                    {meta.intensidade}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <h4 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-tight text-white leading-none group-hover:text-brand-orange transition-colors">
+                                {aula.modalidade}
+                              </h4>
+                            </div>
+
+                            {/* Professor + Micro-CTA para WhatsApp (3 cols) */}
+                            <div className="md:col-span-3 flex flex-wrap md:flex-col items-center md:items-end justify-between gap-2.5">
+                              {aula.professor ? (
+                                <div className="inline-flex items-center gap-2.5 rounded-xl border border-brand-yellow/35 bg-brand-dark/90 px-3.5 py-2">
+                                  <UserCheck
+                                    className="h-4 w-4 text-brand-yellow shrink-0"
+                                    aria-hidden="true"
+                                  />
+                                  <div>
+                                    <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                                      Comando da Aula
+                                    </span>
+                                    <span className="font-display text-lg font-black uppercase tracking-wide text-brand-yellow leading-tight">
+                                      {aula.professor}
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-brand-dark/90 px-3.5 py-2">
+                                  <Flame
+                                    className="h-4 w-4 text-brand-orange shrink-0"
+                                    aria-hidden="true"
+                                  />
+                                  <div>
+                                    <span className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                                      Comando da Aula
+                                    </span>
+                                    <span className="font-display text-base font-black uppercase tracking-wide text-stone-200 leading-tight">
+                                      Instrutor Oficial
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              <a
+                                href={aulaWhatsAppUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="t-learn inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-300 hover:border-brand-orange/60 hover:bg-brand-orange/15 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                              >
+                                <span>Quero essa aula</span>
+                                <span
+                                  className="t-learn-chevron"
+                                  aria-hidden="true"
+                                >
+                                  <svg
+                                    viewBox="0 0 16 16"
+                                    className="h-3.5 w-3.5 text-brand-orange"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path
+                                      className="t-learn-arm t-learn-arm-top"
+                                      d="M6 4L10 8"
+                                    />
+                                    <path
+                                      className="t-learn-arm t-learn-arm-bot"
+                                      d="M10 8L6 12"
+                                    />
+                                  </svg>
+                                </span>
+                              </a>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </SpotlightCard>
         </div>
 
         {/* Escalação de Professores Interativa com React Bits SpotlightCard */}
