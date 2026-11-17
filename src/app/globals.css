@@ -5,6 +5,34 @@
 @layer base {
   :root {
     color-scheme: dark;
+
+    /* transitions.dev — Shared Motion Token Scale */
+    --duration-stagger: 40ms;
+    --duration-micro: 80ms;
+    --duration-quick: 150ms;
+    --duration-fast: 250ms;
+    --duration-medium: 350ms;
+    --duration-slow: 400ms;
+    --duration-very-slow: 500ms;
+
+    --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: ease-in-out;
+    --ease-out: ease-out;
+    --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+    --distance-micro: 4px;
+    --distance-base: 8px;
+    --distance-medium: 12px;
+
+    --blur-small: 2px;
+    --blur-medium: 3px;
+
+    /* Learn more hover (transitions.dev #24) */
+    --learn-shift: 2px;
+    --learn-spread: 8deg;
+    --learn-in: var(--duration-medium);
+    --learn-out: var(--duration-medium);
+    --learn-ease: var(--ease-smooth-out);
   }
 
   html {
@@ -45,13 +73,9 @@
     html {
       scroll-behavior: auto;
     }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
+    .animate-ping,
+    .animate-pulse {
+      animation: none;
     }
   }
 }
@@ -83,18 +107,177 @@
   /* Botão tátil esportivo com micro-elevação exponencial */
   .btn-tactile {
     transition:
-      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-      box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1),
       background-color 0.2s ease,
-      border-color 0.2s ease;
+      border-color 0.2s ease,
+      color 0.2s ease;
   }
 
-  .btn-tactile:hover {
-    transform: translateY(-2px);
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-tactile {
+      transition:
+        transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+        box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+    }
+
+    .btn-tactile:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-tactile:active {
+      transform: translateY(1px);
+    }
   }
 
-  .btn-tactile:active {
-    transform: translateY(1px);
+  /* --- Grade de Aulas: Tabs Deslizantes + Transições Direcionais + Spotlight --- */
+
+  .aulas-tablist {
+    position: relative;
+  }
+
+  .aulas-tab {
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  .aulas-tab[aria-selected='true'] {
+    anchor-name: --active-aulas-tab;
+  }
+
+  /* Indicador acessível via CSS Anchor Positioning (borda em forced-colors) */
+  .aulas-tablist::before {
+    content: '';
+    position: absolute;
+    position-anchor: --active-aulas-tab;
+    inset-block-end: 0.25rem;
+    inset-inline-start: calc(anchor(left) + 0.85rem);
+    inset-inline-end: calc(anchor(right) + 0.85rem);
+    color: #0c0a09;
+    border-block-end: 3px solid currentColor;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aulas-tablist::before {
+      transition: inset var(--duration-fast) var(--ease-smooth-out);
+    }
+  }
+
+  @supports not (position-anchor: auto) {
+    .aulas-tablist::before {
+      display: none;
+    }
+    .aulas-tab[aria-selected='true']::after {
+      content: '';
+      position: absolute;
+      inset-block-end: 0.25rem;
+      inset-inline: 0.85rem;
+      border-block-end: 3px solid currentColor;
+      pointer-events: none;
+      z-index: 20;
+    }
+  }
+
+  /* Pílula deslizante (transitions.dev #16 tabs-sliding) */
+  .aulas-tab-pill {
+    transform: translateX(calc(var(--active-tab-idx, 0) * 100%));
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aulas-tab-pill {
+      transition: transform var(--duration-fast) var(--ease-smooth-out);
+    }
+  }
+
+  /* Entrada direcional com micro cross-blur (transitions.dev #08 + #18) */
+  @keyframes aulas-slide-forward {
+    from {
+      opacity: 0;
+      transform: translateX(var(--distance-base));
+      filter: blur(var(--blur-medium));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes aulas-slide-backward {
+    from {
+      opacity: 0;
+      transform: translateX(calc(var(--distance-base) * -1));
+      filter: blur(var(--blur-medium));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes aulas-row-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(var(--distance-medium));
+      filter: blur(var(--blur-small));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aulas-panel-forward {
+      animation: aulas-slide-forward var(--duration-fast) var(--ease-smooth-out) both;
+    }
+
+    .aulas-panel-backward {
+      animation: aulas-slide-backward var(--duration-fast) var(--ease-smooth-out) both;
+    }
+
+    .aulas-row-stagger {
+      animation: aulas-row-reveal var(--duration-slow) var(--ease-smooth-out) both;
+      animation-delay: calc(var(--row-index, 0) * var(--duration-stagger));
+    }
+  }
+
+  /* Learn more hover (transitions.dev #24): chevron que desliza e abre em seta */
+  .t-learn-chevron {
+    display: inline-flex;
+    transform: translateX(0);
+  }
+
+  .t-learn-arm {
+    transform-box: view-box;
+    transform-origin: 10px 8px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .t-learn-chevron,
+    .t-learn-arm {
+      transition: transform var(--learn-out) var(--learn-ease);
+    }
+    .t-learn:hover .t-learn-chevron {
+      transform: translateX(var(--learn-shift));
+      transition-duration: var(--learn-in);
+    }
+    .t-learn:hover .t-learn-arm {
+      transition-duration: var(--learn-in);
+    }
+    .t-learn:hover .t-learn-arm-top {
+      transform: rotate(var(--learn-spread));
+    }
+    .t-learn:hover .t-learn-arm-bot {
+      transform: rotate(calc(var(--learn-spread) * -1));
+    }
   }
 }
 
