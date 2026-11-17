@@ -1,12 +1,14 @@
+import type { CSSProperties } from 'react';
 import {
   MapPin,
   Clock,
   MessageCircle,
-  ChevronRight,
   Flame,
   Smartphone,
   Disc,
 } from 'lucide-react';
+import { HeroTextLoop } from '@/components/hero/HeroTextLoop';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { ACADEMIA_DATA } from '@/data/academia';
 import { formatPrecoParts, getWhatsAppUrl } from '@/lib/links';
 
@@ -78,7 +80,11 @@ export function Hero() {
           {/* Coluna Esquerda: Manchete Imponente + Placas de Peso + CTAs Táteis */}
           <div className="lg:col-span-7 space-y-7 sm:space-y-8">
             {/* Logo Oficial + Kicker de Arena */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div
+              data-enter="hero-kicker"
+              style={{ '--enter-index': 0 } as CSSProperties}
+              className="hero-enter-stagger flex flex-col sm:flex-row sm:items-center gap-4"
+            >
               <img
                 src="/images/logo-official.png"
                 alt="Logo Oficial Academia Tropical Fit"
@@ -93,8 +99,12 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Manchete Display 900 com Contraste Radical (3x-5x) */}
-            <div className="space-y-5">
+            {/* Manchete Display 900 + Text Loop Animado (React Bits RotatingText) */}
+            <div
+              data-enter="hero-copy"
+              style={{ '--enter-index': 1 } as CSSProperties}
+              className="hero-enter-stagger space-y-5"
+            >
               <h1
                 id="hero-heading"
                 className="font-display text-[clamp(3rem,7.8vw,6.25rem)] font-black uppercase leading-[0.92] tracking-[-0.02em] text-white break-words"
@@ -105,6 +115,8 @@ export function Hero() {
                 </span>{' '}
                 NA ÁGUA QUENTE.
               </h1>
+
+              <HeroTextLoop />
 
               <p className="max-w-[60ch] text-base sm:text-lg lg:text-xl font-normal text-stone-300 leading-relaxed">
                 Arena completa de musculação, peso livre, cardio e aulas
@@ -119,8 +131,10 @@ export function Hero() {
 
             {/* Badges Esportivas em Formato de Anilha / Placa de Peso */}
             <div
+              data-enter="hero-badges"
+              style={{ '--enter-index': 2 } as CSSProperties}
               aria-label="Destaques rápidos da unidade"
-              className="flex flex-wrap items-stretch gap-2.5 sm:gap-3"
+              className="hero-enter-stagger flex flex-wrap items-stretch gap-2.5 sm:gap-3"
             >
               {WEIGHT_PLATE_BADGES.map((badge) => (
                 <div
@@ -162,7 +176,11 @@ export function Hero() {
             </div>
 
             {/* CTAs com Micro-Elevação e Acabamento Tátil */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1">
+            <div
+              data-enter="hero-actions"
+              style={{ '--enter-index': 3 } as CSSProperties}
+              className="hero-enter-stagger flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1"
+            >
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -175,10 +193,23 @@ export function Hero() {
 
               <a
                 href="#planos"
-                className="btn-tactile inline-flex min-h-[56px] items-center justify-center gap-2 rounded-xl border-2 border-brand-dark-border bg-brand-dark-surface px-7 py-4 font-display text-lg sm:text-xl font-black uppercase tracking-wider text-white hover:border-brand-orange hover:text-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                className="t-learn btn-tactile inline-flex min-h-[56px] items-center justify-center gap-2 rounded-xl border-2 border-brand-dark-border bg-brand-dark-surface px-7 py-4 font-display text-lg sm:text-xl font-black uppercase tracking-wider text-white hover:border-brand-orange hover:text-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
               >
                 <span>Ver Planos</span>
-                <ChevronRight className="h-5 w-5 shrink-0" aria-hidden="true" />
+                <span className="t-learn-chevron" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 16 16"
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path className="t-learn-arm t-learn-arm-top" d="M6 4L10 8" />
+                    <path className="t-learn-arm t-learn-arm-bot" d="M10 8L6 12" />
+                  </svg>
+                </span>
               </a>
             </div>
 
@@ -206,9 +237,25 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Coluna Direita: Painel de Arena & Anilha de Performance */}
-          <div className="lg:col-span-5">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-brand-orange bg-brand-dark-card shadow-orange-glow">
+          {/* Coluna Direita: Painel de Arena com React Bits SpotlightCard */}
+          <div
+            data-enter="hero-panel"
+            style={{ '--enter-index': 2 } as CSSProperties}
+            className="hero-enter-stagger lg:col-span-5"
+          >
+            <SpotlightCard
+              spotlightColor="#FF6B00"
+              intensity={0.14}
+              spotlightSize={320}
+              softness={0.75}
+              borderGlow={0.85}
+              proximity={80}
+              smoothing={0.28}
+              grain={0.04}
+              surfaceColor="#141210"
+              borderColor="rgba(255, 107, 0, 0.85)"
+              className="group rounded-2xl shadow-orange-glow"
+            >
               {/* Header Técnico do Painel */}
               <div className="flex items-center justify-between gap-2 bg-brand-orange px-5 py-3 text-black">
                 <div className="flex items-center gap-2">
@@ -229,7 +276,7 @@ export function Hero() {
                   alt="Sala de musculação e peso livre da Academia Tropical Fit Unidade Água Quente"
                   width={600}
                   height={375}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-dark-card via-brand-dark-card/35 to-transparent" />
 
@@ -312,7 +359,7 @@ export function Hero() {
                   </div>
                 </div>
               </div>
-            </div>
+            </SpotlightCard>
           </div>
         </div>
       </div>

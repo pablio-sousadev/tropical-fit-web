@@ -332,6 +332,12 @@
       animation: aulas-bar-rise 320ms var(--ease-bounce) both;
       animation-delay: calc(var(--row-index, 0) * 55ms + var(--bar-index, 0) * 45ms + 80ms);
     }
+
+    /* Entrada inicial do Hero (transitions.dev #18 texts-reveal + tasteskill data-enter) */
+    .hero-enter-stagger {
+      animation: aulas-row-in-forward var(--duration-very-slow) var(--ease-smooth-out) both;
+      animation-delay: calc(var(--enter-index, 0) * var(--duration-stagger));
+    }
   }
 
   /* Learn more hover (transitions.dev #24): chevron que desliza e abre em seta */
