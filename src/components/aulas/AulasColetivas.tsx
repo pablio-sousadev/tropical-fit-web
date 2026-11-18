@@ -280,7 +280,7 @@ export function AulasColetivas() {
 
           {/* Seletor Segmentado com Pílula Deslizante + Indicador Anchor-Positioned */}
           <div className="w-full lg:w-auto lg:shrink-0 space-y-2.5">
-            <div className="rounded-2xl border border-white/10 bg-brand-dark-card/90 p-1.5 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-white/10 bg-brand-dark-card/95 p-1.5 md:bg-brand-dark-card/90 md:backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <div
                 role="tablist"
                 aria-label="Selecionar dia da semana no placar"
@@ -389,7 +389,7 @@ export function AulasColetivas() {
             className="rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_25px_50px_-12px_rgba(0,0,0,0.7)]"
           >
             {/* Barra de Status do Placar persistente com Text Swap */}
-            <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-brand-dark-surface/90 px-5 py-3.5 sm:px-8 backdrop-blur-sm">
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-brand-dark-surface/95 px-5 py-3.5 sm:px-8 md:bg-brand-dark-surface/90 md:backdrop-blur-sm">
               <div
                 key={`header-${diaAtivo}-${transitionKey}`}
                 className={`flex items-center gap-3 ${

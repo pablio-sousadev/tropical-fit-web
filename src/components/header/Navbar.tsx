@@ -76,8 +76,8 @@ export function Navbar() {
       <header
         className={`fixed top-0 inset-x-0 z-50 transition-colors duration-200 ${
           scrolled || isOpen
-            ? 'bg-brand-dark/95 backdrop-blur-md border-b border-brand-dark-border shadow-lg shadow-black/60'
-            : 'bg-brand-dark/85 backdrop-blur-sm border-b border-brand-dark-border/70'
+            ? 'bg-brand-dark/[0.97] md:bg-brand-dark/95 md:backdrop-blur-md border-b border-brand-dark-border shadow-lg shadow-black/60'
+            : 'bg-brand-dark/95 md:bg-brand-dark/85 md:backdrop-blur-sm border-b border-brand-dark-border/70'
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -179,7 +179,7 @@ export function Navbar() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: SMOOTH_OUT_EASE }}
-                className="fixed inset-0 top-16 sm:top-20 bg-black/80 backdrop-blur-sm"
+                className="fixed inset-0 top-16 sm:top-20 bg-black/85 md:bg-black/80 md:backdrop-blur-sm"
                 onClick={() => closeMenu(false)}
                 aria-hidden="true"
               />
@@ -202,7 +202,7 @@ export function Navbar() {
                   transition: { duration: 0.16, ease: SMOOTH_OUT_EASE },
                 }}
                 style={{ transformOrigin: 'top center' }}
-                className="relative z-10 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-brand-dark-border bg-brand-dark/95 backdrop-blur-md px-4 pt-4 pb-6 shadow-2xl"
+                className="relative z-10 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-brand-dark-border bg-brand-dark/[0.98] md:bg-brand-dark/95 md:backdrop-blur-md px-4 pt-4 pb-6 shadow-2xl"
               >
                 <div className="mx-auto max-w-lg space-y-2">
                   {NAV_LINKS.map((link, idx) => (

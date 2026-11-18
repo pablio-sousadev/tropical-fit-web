@@ -183,7 +183,7 @@ export function AppAluno() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/30 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                  <span className="rounded bg-black/85 backdrop-blur-sm px-2.5 py-1 font-display text-[11px] font-black uppercase tracking-wider text-brand-orange border border-brand-orange/40">
+                  <span className="rounded bg-black/90 md:bg-black/85 md:backdrop-blur-sm px-2.5 py-1 font-display text-[11px] font-black uppercase tracking-wider text-brand-orange border border-brand-orange/40">
                     SCA ALUNO EM AÇÃO
                   </span>
                   <span className="font-mono text-[10px] font-bold text-stone-300">

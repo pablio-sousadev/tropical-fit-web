@@ -24,6 +24,16 @@ export function HeroTextLoop() {
 
   const [inView, setInView] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [supportsFinePointer, setSupportsFinePointer] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const query = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const update = () => setSupportsFinePointer(query.matches);
+    update();
+    query.addEventListener?.('change', update);
+    return () => query.removeEventListener?.('change', update);
+  }, []);
 
   // Pausa automaticamente quando o Hero sai da área visível para poupar CPU
   useEffect(() => {
@@ -47,7 +57,7 @@ export function HeroTextLoop() {
       ref={containerRef}
       className="flex flex-wrap items-center gap-2.5 sm:gap-3"
     >
-      <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-white/10 bg-brand-dark-surface/90 p-1.5 pr-3 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-white/10 bg-brand-dark-surface/95 p-1.5 pr-3 md:bg-brand-dark-surface/90 md:backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <span
           className="hidden sm:inline-flex items-center gap-1.5 pl-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-stone-300"
           aria-hidden="true"
@@ -65,8 +75,8 @@ export function HeroTextLoop() {
           <RotatingText
             ref={rotatingRef}
             texts={HERO_LOOP_PHRASES}
-            effect="blur"
-            blur={5}
+            effect={supportsFinePointer ? 'blur' : 'slide'}
+            blur={supportsFinePointer ? 5 : 0}
             splitBy="words"
             staggerDuration={0.045}
             rotationInterval={2800}

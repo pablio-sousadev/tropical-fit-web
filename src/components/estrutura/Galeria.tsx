@@ -91,7 +91,7 @@ export function Galeria() {
           <div
             role="tablist"
             aria-label="Filtrar fotos por ambiente da academia"
-            className="flex max-w-full lg:shrink-0 items-center gap-1 overflow-x-auto no-scrollbar rounded-2xl border border-white/10 bg-brand-dark-card/90 p-1.5 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+            className="flex max-w-full lg:shrink-0 items-center gap-1 overflow-x-auto no-scrollbar rounded-2xl border border-white/10 bg-brand-dark-card/95 p-1.5 md:bg-brand-dark-card/90 md:backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
           >
             {CATEGORIAS_FILTRO.map((cat) => {
               const isSelected = categoriaAtiva === cat;
@@ -194,7 +194,7 @@ export function Galeria() {
                       />
 
                       {/* Selo de Categoria */}
-                      <span className="absolute top-3 left-3 rounded-md bg-brand-dark/90 px-2.5 py-1 font-display text-xs font-black uppercase tracking-widest text-brand-orange border border-brand-orange/40 backdrop-blur-sm">
+                      <span className="absolute top-3 left-3 rounded-md bg-brand-dark/95 px-2.5 py-1 font-display text-xs font-black uppercase tracking-widest text-brand-orange border border-brand-orange/40 md:bg-brand-dark/90 md:backdrop-blur-sm">
                         {foto.categoria}
                       </span>
 

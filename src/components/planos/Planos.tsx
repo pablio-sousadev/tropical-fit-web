@@ -39,6 +39,7 @@ export function Planos() {
   const [activePlanIdx, setActivePlanIdx] = useState<number>(trimestralIndex);
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const pendingTargetRef = useRef<number | null>(null);
 
   const planoMensal = planos.find((p) => p.periodoMeses === 1) ?? planos[0];
 
@@ -47,11 +48,37 @@ export function Planos() {
       ? campanha.subtitulo
       : 'Apresente este ticket pelo WhatsApp ou na recepção da Unidade Água Quente para ativar sua condição especial.';
 
+  const computeClosestIndex = useCallback((): number => {
+    const container = carouselRef.current;
+    if (!container || container.scrollWidth <= container.clientWidth + 8) {
+      return trimestralIndex;
+    }
+
+    const viewportCenter = container.scrollLeft + container.clientWidth / 2;
+    let closestIdx = 0;
+    let minDistance = Number.POSITIVE_INFINITY;
+
+    cardRefs.current.forEach((card, idx) => {
+      if (!card) return;
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(viewportCenter - cardCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIdx = idx;
+      }
+    });
+
+    return closestIdx;
+  }, [trimestralIndex]);
+
   const scrollToPlan = useCallback(
     (index: number, behavior: ScrollBehavior = 'smooth') => {
       const container = carouselRef.current;
       const card = cardRefs.current[index];
       if (!container || !card) return;
+
+      pendingTargetRef.current = behavior === 'smooth' ? index : null;
+      setActivePlanIdx(index);
 
       const targetLeft =
         card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
@@ -59,7 +86,6 @@ export function Planos() {
         left: Math.max(0, targetLeft),
         behavior,
       });
-      setActivePlanIdx(index);
     },
     []
   );
@@ -83,29 +109,54 @@ export function Planos() {
     return () => window.cancelAnimationFrame(rafId);
   }, [trimestralIndex]);
 
-  // Atualiza o card ativo no centro conforme o usuário faz swipe no carrossel
-  const handleCarouselScroll = useCallback(() => {
+  // Atualiza o card ativo com rAF e sem reverter o alvo durante smooth scroll (evita engasgos)
+  useEffect(() => {
     const container = carouselRef.current;
-    if (!container || container.scrollWidth <= container.clientWidth + 8) {
-      return;
+    if (!container) return undefined;
+
+    let rafId = 0;
+    let settleFallbackTimer: ReturnType<typeof setTimeout> | null = null;
+    const supportsScrollEnd = 'onscrollend' in window;
+
+    const handleSettle = () => {
+      pendingTargetRef.current = null;
+      if (container.scrollWidth <= container.clientWidth + 8) return;
+      const settled = computeClosestIndex();
+      setActivePlanIdx((prev) => (prev === settled ? prev : settled));
+    };
+
+    const onScroll = () => {
+      if (pendingTargetRef.current === null) {
+        if (!rafId) {
+          rafId = window.requestAnimationFrame(() => {
+            rafId = 0;
+            if (container.scrollWidth <= container.clientWidth + 8) return;
+            const closest = computeClosestIndex();
+            setActivePlanIdx((prev) => (prev === closest ? prev : closest));
+          });
+        }
+      }
+
+      if (!supportsScrollEnd) {
+        if (settleFallbackTimer) clearTimeout(settleFallbackTimer);
+        settleFallbackTimer = setTimeout(handleSettle, 140);
+      }
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    if (supportsScrollEnd) {
+      container.addEventListener('scrollend', handleSettle, { passive: true });
     }
 
-    const viewportCenter = container.scrollLeft + container.clientWidth / 2;
-    let closestIdx = 0;
-    let minDistance = Number.POSITIVE_INFINITY;
-
-    cardRefs.current.forEach((card, idx) => {
-      if (!card) return;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      const distance = Math.abs(viewportCenter - cardCenter);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestIdx = idx;
+    return () => {
+      container.removeEventListener('scroll', onScroll);
+      if (supportsScrollEnd) {
+        container.removeEventListener('scrollend', handleSettle);
       }
-    });
-
-    setActivePlanIdx((prev) => (prev === closestIdx ? prev : closestIdx));
-  }, []);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (settleFallbackTimer) clearTimeout(settleFallbackTimer);
+    };
+  }, [computeClosestIndex]);
 
   const handlePrevPlan = () => {
     const prevIdx = Math.max(0, activePlanIdx - 1);
@@ -218,7 +269,7 @@ export function Planos() {
         ) : null}
 
         {/* Barra Seletora Rápida no Mobile (Mensal | Trimestral | Semestral) com Pílula Deslizante */}
-        <div className="mb-4 lg:hidden rounded-2xl border border-white/10 bg-brand-dark-card/90 p-1.5 backdrop-blur-md">
+        <div className="mb-4 lg:hidden rounded-2xl border border-white/10 bg-brand-dark-card/95 p-1.5">
           <div
             role="tablist"
             aria-label="Selecionar plano para centralizar"
@@ -264,12 +315,15 @@ export function Planos() {
         {/* Carrossel Centralizado com Snap no Mobile -> 3 Colunas no Desktop com Tilt 3D & BorderGlow no Plano Principal */}
         <div
           ref={carouselRef}
-          onScroll={handleCarouselScroll}
+          onTouchStart={() => {
+            pendingTargetRef.current = null;
+          }}
           style={{
             scrollSnapType: 'x mandatory',
             overscrollBehaviorX: 'contain',
+            touchAction: 'pan-x pan-y',
           }}
-          className="flex lg:grid lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-8 items-stretch overflow-x-auto lg:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-[11vw] sm:px-[18vw] lg:mx-0 lg:px-0 py-5 touch-pan-y"
+          className="flex lg:grid lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-8 items-stretch overflow-x-auto lg:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-[11vw] sm:px-[18vw] lg:mx-0 lg:px-0 py-5"
         >
           {planos.map((plano, idx) => {
             const preco = formatPrecoParts(plano.precoMensal);
@@ -430,7 +484,7 @@ export function Planos() {
                   }
                 }}
                 style={{ scrollSnapAlign: 'center' }}
-                className={`relative flex w-[78vw] max-w-[330px] sm:w-[350px] sm:max-w-[350px] lg:w-auto lg:max-w-none shrink-0 snap-center flex-col transition-all duration-300 cursor-pointer lg:cursor-default ${
+                className={`relative flex w-[78vw] max-w-[330px] sm:w-[350px] sm:max-w-[350px] lg:w-auto lg:max-w-none shrink-0 snap-center flex-col transition-[transform,opacity] duration-200 ease-out cursor-pointer lg:cursor-default ${
                   isCenteredMobile
                     ? 'scale-100 opacity-100 z-10'
                     : 'scale-95 opacity-75 lg:scale-100 lg:opacity-100'

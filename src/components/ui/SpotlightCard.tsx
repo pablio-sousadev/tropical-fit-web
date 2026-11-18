@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 export type SpotlightShape = 'circle' | 'beam';
 
@@ -129,15 +129,40 @@ export function SpotlightCard(props: SpotlightCardProps) {
   const grainRef = useRef<HTMLSpanElement>(null);
   const edgeRef = useRef<HTMLSpanElement>(null);
   const wakeRef = useRef<(() => void) | null>(null);
+  const [interactive, setInteractive] = useState(false);
 
   const palette = THEMES[theme] ?? THEMES.dark;
   const color = spotlightColor ?? palette.light;
   const form = SHAPES.includes(shape) ? shape : 'circle';
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const pointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      setInteractive(pointerQuery.matches && !motionQuery.matches);
+    };
+    update();
+    pointerQuery.addEventListener?.('change', update);
+    motionQuery.addEventListener?.('change', update);
+    return () => {
+      pointerQuery.removeEventListener?.('change', update);
+      motionQuery.removeEventListener?.('change', update);
+    };
+  }, []);
+
+  const { fillStops, edgeStops } = useMemo(
+    () => ({
+      fillStops: interactive ? falloff(color, softness) : '',
+      edgeStops: interactive ? falloff(color, 1) : '',
+    }),
+    [interactive, color, softness]
+  );
+
   const settings: Settings = {
     shape: form,
-    fill: falloff(color, softness),
-    edge: falloff(color, 1),
+    fill: fillStops,
+    edge: edgeStops,
     size: Math.max(20, spotlightSize),
     intensity: clamp(intensity, 0, 1) * palette.fill,
     borderGlow: clamp(borderGlow, 0, 1) * palette.edge,
@@ -152,15 +177,19 @@ export function SpotlightCard(props: SpotlightCardProps) {
   settingsRef.current = settings;
 
   useEffect(() => {
-    wakeRef.current?.();
-  });
+    if (interactive && ambient) {
+      wakeRef.current?.();
+    }
+  }, [interactive, ambient]);
 
   useEffect(() => {
+    if (!interactive) return undefined;
+
     const root = rootRef.current;
     const light = lightRef.current;
     const noise = grainRef.current;
     const edge = edgeRef.current;
-    if (!root || !light || !noise || !edge) return undefined;
+    if (!root || !light || !edge) return undefined;
 
     const reduce =
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -219,16 +248,18 @@ export function SpotlightCard(props: SpotlightCardProps) {
       edge.style.opacity = String(
         Math.min(1, state.presence * s.borderGlow * boost)
       );
-      const grainy =
-        s.grain > 0
-          ? gradient(s, size, state.x, state.y, '#000 0%, transparent 100%')
-          : 'none';
-      if (grainy !== drawn.noise) {
-        drawn.noise = grainy;
-        noise.style.webkitMaskImage = grainy;
-        noise.style.maskImage = grainy;
+      if (noise) {
+        const grainy =
+          s.grain > 0
+            ? gradient(s, size, state.x, state.y, '#000 0%, transparent 100%')
+            : 'none';
+        if (grainy !== drawn.noise) {
+          drawn.noise = grainy;
+          noise.style.webkitMaskImage = grainy;
+          noise.style.maskImage = grainy;
+        }
+        noise.style.opacity = String(state.presence * s.grain);
       }
-      noise.style.opacity = String(state.presence * s.grain);
     };
 
     const tick = (now: number) => {
@@ -313,6 +344,7 @@ export function SpotlightCard(props: SpotlightCardProps) {
     wakeRef.current = wake;
 
     const onMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.active = true;
@@ -330,6 +362,7 @@ export function SpotlightCard(props: SpotlightCardProps) {
       wake();
     };
     const onDown = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.active = true;
@@ -358,7 +391,7 @@ export function SpotlightCard(props: SpotlightCardProps) {
       wake();
     };
     const onScroll = () => {
-      if (pointer.active || state.presence > 0) wake();
+      if (pointer.active || state.presence > 0 || focus) wake();
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -366,7 +399,7 @@ export function SpotlightCard(props: SpotlightCardProps) {
       if (state.visible) wake();
     });
     observer.observe(root);
-    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointermove', onMove, { passive: true });
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
     window.addEventListener('scroll', onScroll, { capture: true, passive: true });
@@ -390,28 +423,33 @@ export function SpotlightCard(props: SpotlightCardProps) {
       root.removeEventListener('focusout', onFocusOut);
       wakeRef.current = null;
     };
-  }, []);
+  }, [interactive]);
 
+  const resolvedBorder = borderColor ?? palette.border;
   const computedStyle = {
     '--spotlight-card-surface': surfaceColor ?? palette.surface,
-    '--spotlight-card-border': borderColor ?? palette.border,
-    '--spotlight-card-shadow': palette.shadow,
+    '--spotlight-card-border': resolvedBorder,
+    '--spotlight-card-shadow': interactive
+      ? palette.shadow
+      : `inset 0 0 0 1px ${resolvedBorder}, ${palette.shadow}`,
     ...style,
   } as React.CSSProperties;
 
-  const overlays = (
+  const overlays = interactive ? (
     <>
       <span
         ref={lightRef}
         className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] opacity-0"
         aria-hidden="true"
       />
-      <span
-        ref={grainRef}
-        className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[length:160px_160px] opacity-0 mix-blend-overlay"
-        style={{ backgroundImage: NOISE }}
-        aria-hidden="true"
-      />
+      {settings.grain > 0 ? (
+        <span
+          ref={grainRef}
+          className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[length:160px_160px] opacity-0 mix-blend-overlay"
+          style={{ backgroundImage: NOISE }}
+          aria-hidden="true"
+        />
+      ) : null}
       {children}
       <span
         className="pointer-events-none absolute inset-0 z-[1] rounded-[inherit] p-px [background:var(--spotlight-card-border)] [-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [-webkit-mask-composite:xor] [mask:linear-gradient(#000_0_0)_content-box_exclude,linear-gradient(#000_0_0)]"
@@ -423,6 +461,8 @@ export function SpotlightCard(props: SpotlightCardProps) {
         aria-hidden="true"
       />
     </>
+  ) : (
+    children
   );
 
   if (as === 'button') {

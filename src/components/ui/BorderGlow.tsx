@@ -5,6 +5,7 @@ import {
   useCallback,
   useState,
   useEffect,
+  useMemo,
   type ReactNode,
   type CSSProperties,
 } from 'react';
@@ -150,10 +151,20 @@ export function BorderGlow({
   style,
 }: BorderGlowProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [supportsHover, setSupportsHover] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [cursorAngle, setCursorAngle] = useState(45);
   const [edgeProximity, setEdgeProximity] = useState(0);
   const [sweepActive, setSweepActive] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const query = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const update = () => setSupportsHover(query.matches);
+    update();
+    query.addEventListener?.('change', update);
+    return () => query.removeEventListener?.('change', update);
+  }, []);
 
   const getCenterOfElement = useCallback((el: HTMLElement) => {
     const { width, height } = el.getBoundingClientRect();
@@ -271,105 +282,124 @@ export function BorderGlow({
       )
     : 0;
 
-  const meshGradients = buildMeshGradients(colors);
-  const borderBg = meshGradients.map((g) => `${g} border-box`);
-  const fillBg = meshGradients.map((g) => `${g} padding-box`);
+  const glowLayersEnabled = supportsHover || sweepActive;
+  const colorKey = colors.join('|');
+  const { borderBg, fillBg, glowShadow } = useMemo(() => {
+    if (!glowLayersEnabled) {
+      return { borderBg: [] as string[], fillBg: '', glowShadow: '' };
+    }
+    const meshGradients = buildMeshGradients(colors);
+    return {
+      borderBg: meshGradients.map((g) => `${g} border-box`),
+      fillBg: meshGradients.map((g) => `${g} padding-box`).join(', '),
+      glowShadow: buildBoxShadow(glowColor, glowIntensity),
+    };
+  }, [glowLayersEnabled, colorKey, glowColor, glowIntensity]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const angleDeg = `${cursorAngle.toFixed(3)}deg`;
 
   return (
     <div
       ref={cardRef}
-      onPointerMove={handlePointerMove}
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
+      onPointerMove={supportsHover ? handlePointerMove : undefined}
+      onPointerEnter={(e) => {
+        if (supportsHover && e.pointerType === 'mouse') setIsHovered(true);
+      }}
+      onPointerLeave={(e) => {
+        if (supportsHover && e.pointerType === 'mouse') setIsHovered(false);
+      }}
       className={`relative grid isolate border-2 ${className}`}
       style={{
         background: backgroundColor,
         borderColor,
         borderRadius: `${borderRadius}px`,
-        transform: 'translate3d(0, 0, 0.01px)',
+        transform: supportsHover ? 'translate3d(0, 0, 0.01px)' : undefined,
         ...style,
       }}
     >
-      {/* Borda luminosa cônica sensível ao cursor */}
-      <div
-        className="pointer-events-none absolute -inset-[2px] rounded-[inherit] -z-[1]"
-        style={{
-          border: '2px solid transparent',
-          background: [
-            `linear-gradient(${backgroundColor} 0 100%) padding-box`,
-            'linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box',
-            ...borderBg,
-          ].join(', '),
-          opacity: borderOpacity,
-          maskImage: `conic-gradient(from ${angleDeg} at center, black ${coneSpread}%, transparent ${coneSpread + 15}%, transparent ${100 - coneSpread - 15}%, black ${100 - coneSpread}%)`,
-          WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black ${coneSpread}%, transparent ${coneSpread + 15}%, transparent ${100 - coneSpread - 15}%, black ${100 - coneSpread}%)`,
-          transition: isVisible
-            ? 'opacity 0.25s ease-out'
-            : 'opacity 0.75s ease-in-out',
-        }}
-        aria-hidden="true"
-      />
+      {glowLayersEnabled ? (
+        <>
+          {/* Borda luminosa cônica sensível ao cursor */}
+          <div
+            className="pointer-events-none absolute -inset-[2px] rounded-[inherit] -z-[1]"
+            style={{
+              border: '2px solid transparent',
+              background: [
+                `linear-gradient(${backgroundColor} 0 100%) padding-box`,
+                'linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box',
+                ...borderBg,
+              ].join(', '),
+              opacity: borderOpacity,
+              maskImage: `conic-gradient(from ${angleDeg} at center, black ${coneSpread}%, transparent ${coneSpread + 15}%, transparent ${100 - coneSpread - 15}%, black ${100 - coneSpread}%)`,
+              WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black ${coneSpread}%, transparent ${coneSpread + 15}%, transparent ${100 - coneSpread - 15}%, black ${100 - coneSpread}%)`,
+              transition: isVisible
+                ? 'opacity 0.25s ease-out'
+                : 'opacity 0.75s ease-in-out',
+            }}
+            aria-hidden="true"
+          />
 
-      {/* Preenchimento sutil próximo às bordas */}
-      <div
-        className="pointer-events-none absolute inset-0 rounded-[inherit] -z-[1]"
-        style={{
-          border: '1px solid transparent',
-          background: fillBg.join(', '),
-          maskImage: [
-            'linear-gradient(to bottom, black, black)',
-            'radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%)',
-            'radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%)',
-            `conic-gradient(from ${angleDeg} at center, transparent 5%, black 15%, black 85%, transparent 95%)`,
-          ].join(', '),
-          WebkitMaskImage: [
-            'linear-gradient(to bottom, black, black)',
-            'radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%)',
-            'radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%)',
-            'radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%)',
-            `conic-gradient(from ${angleDeg} at center, transparent 5%, black 15%, black 85%, transparent 95%)`,
-          ].join(', '),
-          maskComposite: 'subtract, add, add, add, add, add',
-          WebkitMaskComposite:
-            'source-out, source-over, source-over, source-over, source-over, source-over',
-          opacity: borderOpacity * fillOpacity,
-          mixBlendMode: 'soft-light',
-          transition: isVisible
-            ? 'opacity 0.25s ease-out'
-            : 'opacity 0.75s ease-in-out',
-        }}
-        aria-hidden="true"
-      />
+          {/* Preenchimento sutil próximo às bordas */}
+          <div
+            className="pointer-events-none absolute inset-0 rounded-[inherit] -z-[1]"
+            style={{
+              border: '1px solid transparent',
+              background: fillBg,
+              maskImage: [
+                'linear-gradient(to bottom, black, black)',
+                'radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%)',
+                'radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%)',
+                `conic-gradient(from ${angleDeg} at center, transparent 5%, black 15%, black 85%, transparent 95%)`,
+              ].join(', '),
+              WebkitMaskImage: [
+                'linear-gradient(to bottom, black, black)',
+                'radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%)',
+                'radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%)',
+                'radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%)',
+                `conic-gradient(from ${angleDeg} at center, transparent 5%, black 15%, black 85%, transparent 95%)`,
+              ].join(', '),
+              maskComposite: 'subtract, add, add, add, add, add',
+              WebkitMaskComposite:
+                'source-out, source-over, source-over, source-over, source-over, source-over',
+              opacity: borderOpacity * fillOpacity,
+              mixBlendMode: 'soft-light',
+              transition: isVisible
+                ? 'opacity 0.25s ease-out'
+                : 'opacity 0.75s ease-in-out',
+            }}
+            aria-hidden="true"
+          />
 
-      {/* Glow externo nas bordas */}
-      <span
-        className="pointer-events-none absolute z-[1] rounded-[inherit]"
-        style={{
-          inset: `${-glowRadius}px`,
-          maskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
-          WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
-          opacity: glowOpacity,
-          mixBlendMode: 'plus-lighter',
-          transition: isVisible
-            ? 'opacity 0.25s ease-out'
-            : 'opacity 0.75s ease-in-out',
-        }}
-        aria-hidden="true"
-      >
-        <span
-          className="absolute rounded-[inherit]"
-          style={{
-            inset: `${glowRadius}px`,
-            boxShadow: buildBoxShadow(glowColor, glowIntensity),
-          }}
-        />
-      </span>
+          {/* Glow externo nas bordas */}
+          <span
+            className="pointer-events-none absolute z-[1] rounded-[inherit]"
+            style={{
+              inset: `${-glowRadius}px`,
+              maskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
+              WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
+              opacity: glowOpacity,
+              mixBlendMode: 'plus-lighter',
+              transition: isVisible
+                ? 'opacity 0.25s ease-out'
+                : 'opacity 0.75s ease-in-out',
+            }}
+            aria-hidden="true"
+          >
+            <span
+              className="absolute rounded-[inherit]"
+              style={{
+                inset: `${glowRadius}px`,
+                boxShadow: glowShadow,
+              }}
+            />
+          </span>
+        </>
+      ) : null}
 
       <div className="relative z-[2] flex h-full flex-col justify-between">
         {children}

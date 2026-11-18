@@ -67,12 +67,12 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 5rem;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-brand-dark text-stone-100 font-sans antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
     font-kerning: normal;
   }
 
@@ -221,56 +221,48 @@
     }
   }
 
-  /* Entrada & saída direcional de painel + cascata com micro cross-blur (transitions.dev #08 + #18) */
+  /* Entrada & saída direcional de painel + cascata (GPU transform+opacity no mobile, cross-blur no desktop) */
   @keyframes aulas-panel-in-forward {
     from {
       opacity: 0;
-      transform: translateX(32px);
-      filter: blur(var(--blur-medium));
+      transform: translate3d(32px, 0, 0);
     }
     to {
       opacity: 1;
-      transform: translateX(0);
-      filter: blur(0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes aulas-panel-in-backward {
     from {
       opacity: 0;
-      transform: translateX(-32px);
-      filter: blur(var(--blur-medium));
+      transform: translate3d(-32px, 0, 0);
     }
     to {
       opacity: 1;
-      transform: translateX(0);
-      filter: blur(0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes aulas-panel-out-forward {
     from {
       opacity: 1;
-      transform: translateX(0);
-      filter: blur(0);
+      transform: translate3d(0, 0, 0);
     }
     to {
       opacity: 0;
-      transform: translateX(-28px);
-      filter: blur(var(--blur-medium));
+      transform: translate3d(-28px, 0, 0);
     }
   }
 
   @keyframes aulas-panel-out-backward {
     from {
       opacity: 1;
-      transform: translateX(0);
-      filter: blur(0);
+      transform: translate3d(0, 0, 0);
     }
     to {
       opacity: 0;
-      transform: translateX(28px);
-      filter: blur(var(--blur-medium));
+      transform: translate3d(28px, 0, 0);
     }
   }
 
@@ -278,12 +270,10 @@
     from {
       opacity: 0;
       transform: translate3d(16px, var(--distance-medium), 0);
-      filter: blur(var(--blur-small));
     }
     to {
       opacity: 1;
       transform: translate3d(0, 0, 0);
-      filter: blur(0);
     }
   }
 
@@ -291,25 +281,114 @@
     from {
       opacity: 0;
       transform: translate3d(-16px, var(--distance-medium), 0);
-      filter: blur(var(--blur-small));
     }
     to {
       opacity: 1;
       transform: translate3d(0, 0, 0);
-      filter: blur(0);
     }
   }
 
   @keyframes aulas-header-swap {
     from {
       opacity: 0;
-      transform: translateY(6px);
-      filter: blur(var(--blur-small));
+      transform: translate3d(0, 6px, 0);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    @keyframes aulas-panel-in-forward {
+      from {
+        opacity: 0;
+        transform: translate3d(32px, 0, 0);
+        filter: blur(var(--blur-medium));
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes aulas-panel-in-backward {
+      from {
+        opacity: 0;
+        transform: translate3d(-32px, 0, 0);
+        filter: blur(var(--blur-medium));
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes aulas-panel-out-forward {
+      from {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: translate3d(-28px, 0, 0);
+        filter: blur(var(--blur-medium));
+      }
+    }
+
+    @keyframes aulas-panel-out-backward {
+      from {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: translate3d(28px, 0, 0);
+        filter: blur(var(--blur-medium));
+      }
+    }
+
+    @keyframes aulas-row-in-forward {
+      from {
+        opacity: 0;
+        transform: translate3d(16px, var(--distance-medium), 0);
+        filter: blur(var(--blur-small));
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes aulas-row-in-backward {
+      from {
+        opacity: 0;
+        transform: translate3d(-16px, var(--distance-medium), 0);
+        filter: blur(var(--blur-small));
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes aulas-header-swap {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 6px, 0);
+        filter: blur(var(--blur-small));
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
     }
   }
 
@@ -374,7 +453,7 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
-    touch-action: pan-y manipulation;
+    touch-action: pan-x pan-y;
     --fade-size: 2rem;
     scroll-padding-inline: var(--fade-size);
     --fade-dir: right;
@@ -431,54 +510,65 @@
     }
   }
 
-  /* Card hover tilt 3D + glare (transitions.dev #19) */
+  /* Card hover tilt 3D + glare (transitions.dev #19, somente desktop com mouse) */
   .t-tilt-card {
     position: relative;
-    transform:
-      perspective(var(--tilt-perspective))
-      rotateX(var(--tilt-rx, 0deg))
-      rotateY(var(--tilt-ry, 0deg));
-    transform-style: preserve-3d;
-    transition: transform var(--tilt-return) var(--tilt-return-ease);
-    will-change: transform;
-  }
-
-  .t-tilt-card.is-tilting {
-    transition: transform var(--tilt-follow) var(--tilt-follow-ease);
   }
 
   .t-tilt-glare {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    mix-blend-mode: screen;
-    background:
-      radial-gradient(
-        circle 110px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
-        rgba(255, 190, 120, 0.34),
-        rgba(255, 107, 0, 0.08) 52%,
-        rgba(255, 107, 0, 0) 84%
-      ),
-      radial-gradient(
-        circle 240px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
-        rgba(255, 255, 255, 0.16),
-        rgba(255, 255, 255, 0.03) 58%,
-        rgba(255, 255, 255, 0) 78%
-      );
-    transition: opacity var(--tilt-glare-fade) var(--tilt-glare-ease);
-    z-index: 3;
+    display: none;
   }
 
-  .t-tilt.is-hover .t-tilt-glare {
-    opacity: var(--tilt-glare-opacity);
+  @media (hover: hover) and (pointer: fine) {
+    .t-tilt-card {
+      transform:
+        perspective(var(--tilt-perspective))
+        rotateX(var(--tilt-rx, 0deg))
+        rotateY(var(--tilt-ry, 0deg));
+      transform-style: preserve-3d;
+      transition: transform var(--tilt-return) var(--tilt-return-ease);
+      will-change: transform;
+    }
+
+    .t-tilt-card.is-tilting {
+      transition: transform var(--tilt-follow) var(--tilt-follow-ease);
+    }
+
+    .t-tilt-glare {
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(
+          circle 110px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+          rgba(255, 190, 120, 0.34),
+          rgba(255, 107, 0, 0.08) 52%,
+          rgba(255, 107, 0, 0) 84%
+        ),
+        radial-gradient(
+          circle 240px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+          rgba(255, 255, 255, 0.16),
+          rgba(255, 255, 255, 0.03) 58%,
+          rgba(255, 255, 255, 0) 78%
+        );
+      transition: opacity var(--tilt-glare-fade) var(--tilt-glare-ease);
+      z-index: 3;
+    }
+
+    .t-tilt.is-hover .t-tilt-glare {
+      opacity: var(--tilt-glare-opacity);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .t-tilt-card {
       transform: none !important;
       transition: none !important;
+      will-change: auto;
     }
     .t-tilt-glare {
       display: none;
